@@ -5,13 +5,25 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0', // Allow external connections
+    host: "0.0.0.0", // Allow external connections
     port: 5173,
     strictPort: true,
-    allowedHosts: [
-      '38a8c32620bf.ngrok-free.app',
-      'localhost',
-      '127.0.0.1'
-    ],
+    allowedHosts: ["38a8c32620bf.ngrok-free.app", "localhost", "127.0.0.1"],
   },
-})
+  build: {
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: {
+          spline: ["@splinetool/runtime", "@splinetool/react-spline"],
+        },
+      },
+    },
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
+  optimizeDeps: {
+    include: ["@splinetool/runtime", "@splinetool/react-spline"],
+  },
+});
