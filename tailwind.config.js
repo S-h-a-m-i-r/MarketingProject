@@ -6,10 +6,8 @@ export default {
   ],
   theme: {
     extend: {
-      screens: {
-'max-xs': { max: '419px' },  // below 420px
-      'max-2xs': { max: '314px' }, // below 315px
-        'sm': '450px',
+      screens: {  // below 420px
+        'sm': '420px',  // Changed from 450px to 420px to include iPhone 12 Pro Max
         'md': '768px',
         'lg': '1024px',
         'xl': '1280px',
