@@ -8,6 +8,8 @@ const SplineModel = ({
   onError = null,
   bookColor = null,
   objectName = "Book", // Name of the object in Spline to change color
+  isVisible = true, // Control visibility
+  preload = false, // Preload the model
   ...props
 }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +60,11 @@ const SplineModel = ({
     );
   }
 
+  // Don't render if not visible and not preloading
+  if (!isVisible && !preload) {
+    return null;
+  }
+
   return (
     <>
       <Spline
@@ -66,7 +73,7 @@ const SplineModel = ({
         onError={handleError}
         className={`w-full h-full ${
           isLoading ? "opacity-0" : "opacity-100"
-        } transition-opacity duration-300`}
+        } transition-opacity duration-300 ${!isVisible ? "hidden" : ""}`}
         {...props}
       />
     </>

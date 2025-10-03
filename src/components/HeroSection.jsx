@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import landingBackground from "../assets/images/without draw.png";
 import clock from "../assets/images/11211.png";
 import phone from "../assets/images/tel.png";
@@ -13,22 +13,58 @@ import image10 from "../assets/images/images (10).png";
 import image14 from "../assets/images/images (14).png";
 import image15 from "../assets/images/images (15).png";
 import image16 from "../assets/images/images (16) 2.png";
+import phoneClickSound from "../assets/sounds/telephone-ring-313223.mp3";
+import useScrollToSection from "../hooks/useScrollToSection";
+import writingSound from "../assets/sounds/writing-on-paper-6988.mp3";
+import ClientInfoTooltip from "../components/ClientInfoTooltip";
 const HeroSection = ({
   navigationItems,
   capturedImage,
   handleCameraClick,
   scrollToAbout,
+  animationStates = {},
 }) => {
   // Array of images to cycle through
   const imageList = [whiteInkPng, image10, image14, image15, image16];
-
-  // State to track current image index
+  const { mouseCLickRing } = useScrollToSection();
+  // tate to track current image index
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Function to handle image click and cycle to next image
+
+  const handlephoneClick = () => {
+    playSound("phone");
+    scrollToAbout();
+  };
+
+  const playSound = useCallback((soundType = "") => {
+    const soundMap = {
+      phone: phoneClickSound,
+      writing: writingSound,
+    };
+
+    const soundFile = soundMap[soundType] || null;
+    if (!soundFile) return;
+
+    const audio = new Audio(soundFile);
+    audio.volume = 0.5; // Set volume to 50%
+
+    audio.play().catch((error) => {
+      console.error(`Error playing ${soundType} sound:`, error);
+    });
+
+    // Stop the audio after 3 seconds
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0; // Reset to beginning
+    }, 3000);
+  }, []);
+
   const handleImageClick = () => {
+    mouseCLickRing();
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
   };
+
   return (
     <div className="w-full bg-amber-100">
       <div className=" bg-amber-100 relative bg-no-repeat bg-fit flex flex-col max-sm:h-[100dvh]">
@@ -50,42 +86,66 @@ const HeroSection = ({
         "
         >
           <div className=" pl-10 pr-15 max-2xs:pr-40 2xl:pr-80 2xl:pl-80 flex items-center justify-between xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-1 md:pl-30">
-            <img
-              src={clock}
-              alt="clock"
-              className=" h-20 ml-1 w-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-105 clock-hover-glow
+            <ClientInfoTooltip placement="top">
+              <img
+                src={clock}
+                alt="clock"
+                className=" h-20 ml-1 w-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-105 clock-hover-glow
                 sm:h-30 sm:w-20 md:h-35 md:w-30 lg:h-50 lg:w-35 xl:h-75 xl:w-50 2xl:h-80 2xl:w-60"
-            />
+              />
+            </ClientInfoTooltip>
             <div className="flex items-center justify-between xl:pr-10 lg:pr-10 md:pr-30 sm:pr-2 sm:gap-1 sm:justify-center">
-              {navigationItems.map((item, index) => (
-                <div
-                  key={index}
-                  className={`h-25 w-6 cursor-pointer bg-cover bg-center bg-no-repeat flex items-center justify-center relative group
-                   transition-all duration-300 ease-in-out hover:scale-y-105
-                   hover:shadow-[0_0_20px_5px_rgba(255,255,0,0.7)]
-                   ${"2xl:h-90 2xl:w-20 xl:h-80 xl:w-18 lg:h-50 lg:w-10 md:h-35 md:w-8 sm:h-30 sm:w-8"}`}
-                  style={{
-                    ...item.style,
-                    writingMode: "vertical-rl",
-                    textOrientation: "mixed",
-                    transform: "rotate(180deg)",
-                    color: "#E9E4DC",
-                    letterSpacing: "2px",
-                  }}
-                  onClick={item.onClick}
-                >
-                  {item.text}
-                  {/* Hover Frame */}
-                  <img
-                    src={hoverFrame}
-                    alt="hover frame"
-                    className="absolute w-full h-full  opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out pointer-events-none"
+              {navigationItems.map((item, index) => {
+                // Determine if this book should be hidden based on animation state
+                const isHidden =
+                  (item.text === "CONTACT" &&
+                    animationStates.showContactAnimation) ||
+                  (item.text === "BECAUSE" &&
+                    animationStates.showBecauseAnimation) ||
+                  (item.text === "Lorem" &&
+                    animationStates.showLoremAnimation) ||
+                  (item.text === "SERVICES" &&
+                    animationStates.showServicesAnimation) ||
+                  (item.text === "ABOUT" &&
+                    animationStates.showAboutAnimation) ||
+                  (item.text === "WHITE INK" &&
+                    animationStates.showWhiteInkAnimation);
+
+                return (
+                  <div
+                    key={index}
+                    className={`h-25 w-6 cursor-pointer bg-cover bg-center bg-no-repeat flex items-center justify-center relative group
+                     transition-all duration-300 ease-in-out hover:scale-y-105
+                     hover:shadow-[0_0_20px_5px_rgba(255,255,0,0.7)]
+                     ${
+                       isHidden
+                         ? "opacity-0 pointer-events-none"
+                         : "opacity-100"
+                     }
+                     ${"2xl:h-90 2xl:w-20 xl:h-80 xl:w-18 lg:h-50 lg:w-10 md:h-35 md:w-8 sm:h-30 sm:w-8"}`}
                     style={{
+                      ...item.style,
+                      writingMode: "vertical-rl",
+                      textOrientation: "mixed",
                       transform: "rotate(180deg)",
+                      color: "#E9E4DC",
+                      letterSpacing: "2px",
                     }}
-                  />
-                </div>
-              ))}
+                    onClick={item.onClick}
+                  >
+                    {item.text}
+                    {/* Hover Frame */}
+                    <img
+                      src={hoverFrame}
+                      alt="hover frame"
+                      className="absolute w-full h-full  opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out pointer-events-none"
+                      style={{
+                        transform: "rotate(180deg)",
+                      }}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className=" max-2xl:pr-20 pt-18 pr-10 pl-15 max-xs:pr-0 max-xs:pt-0 max-xs:pl-0 flex items-center justify-between xl:pt-40 lg:pt-20 2xl:pr-90 2xl:pl-80 xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-20 md:pl-30 md:pt-15 sm:pt-20 sm:pr-35 sm:pl-30">
@@ -94,7 +154,7 @@ const HeroSection = ({
               alt="phone"
               className=" h-15 ml-1 cursor-pointer transition-all duration-550 hover:ease-in-out hover:scale-y-103 phone-hover-glow
                2xl:h-75 2xl:ml-5 xl:h-65 xl:ml-4 lg:h-50 lg:ml-3 md:h-35 md:ml-2 sm:h-40 sm:ml-1"
-              onClick={scrollToAbout}
+              onClick={handlephoneClick}
             />
             <div className="flex flex-col items-center mt-[10px] 2xl:mt-[110px] xl:mt-[90px] lg:mt-[70px]  md:mt-[60px] sm:mt-[40px]">
               <img
@@ -102,6 +162,7 @@ const HeroSection = ({
                 alt="inkPot"
                 className=" h-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-103 inkpot-hover-glow
                  2xl:h-55 xl:h-45 lg:h-40 md:h-26 sm:h-30"
+                onClick={() => playSound("writing")}
               />
             </div>
             <div className="flex flex-col items-center cursor-pointer md:pr-15 lg:pr-10 ">

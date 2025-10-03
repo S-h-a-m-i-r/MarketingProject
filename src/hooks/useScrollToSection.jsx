@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react';
-
+import telephoneRingSound from "../assets/sounds/mouse-click-153941.mp3";
 const useScrollToSection = () => {
   const aboutRef = useRef(null);
   const contactRef = useRef(null);
@@ -17,24 +17,84 @@ const useScrollToSection = () => {
   const scrollToSection = useCallback((ref) => {
     if (ref?.current) {
       ref.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+        behavior: "smooth",
+        block: "start",
       });
     }
   }, []);
 
-  const scrollToAbout = useCallback(() => scrollToSection(aboutRef), [scrollToSection]);
-  const scrollToContact = useCallback(() => scrollToSection(contactRef), [scrollToSection]);
-  const scrollToSeera = useCallback(() => scrollToSection(seeraRef), [scrollToSection]);
-  const scrollToWhiteInk = useCallback(() => scrollToSection(whiteInkRef), [scrollToSection]);
-  const scrollToStrategy = useCallback(() => scrollToSection(strategyRef), [scrollToSection]);
-  const scrollToBranding = useCallback(() => scrollToSection(brandingRef), [scrollToSection]);
-  const scrollToAdvertising = useCallback(() => scrollToSection(advertisingRef), [scrollToSection]);
-  const scrollToExhibition = useCallback(() => scrollToSection(exhibitionRef), [scrollToSection]);
-  const scrollToDigital = useCallback(() => scrollToSection(digitalRef), [scrollToSection]);
-  const scrollToCreative = useCallback(() => scrollToSection(creativeRef), [scrollToSection]);
-  const scrollToOutdoor = useCallback(() => scrollToSection(outdoorRef), [scrollToSection]);
-  const scrollToBecauseForUs = useCallback(() => scrollToSection(becauseForUsRef), [scrollToSection]);
+  const mouseCLickRing = () => {
+    const audio = new Audio(telephoneRingSound);
+    audio.volume = 0.5; // Set volume to 50%
+    audio.play().catch((error) => {
+      console.error("Error playing telephone ring sound:", error);
+    });
+
+    // Stop the audio after 3 seconds
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0; // Reset to beginning
+    }, 3000);
+  };
+
+  const scrollToSectionWithSound = useCallback(
+    (ref) => {
+      if (ref?.current) {
+        mouseCLickRing();
+        scrollToSection(ref);
+        ref;
+      }
+    },
+    [scrollToSection]
+  );
+  const scrollToAbout = useCallback(
+    () => scrollToSection(aboutRef),
+    [scrollToSection]
+  );
+  const scrollToContact = useCallback(
+    () => scrollToSectionWithSound(contactRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToSeera = useCallback(
+    () => scrollToSectionWithSound(seeraRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToWhiteInk = useCallback(
+    () => scrollToSectionWithSound(whiteInkRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToStrategy = useCallback(
+    () => scrollToSectionWithSound(strategyRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToBranding = useCallback(
+    () => scrollToSectionWithSound(brandingRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToAdvertising = useCallback(
+    () => scrollToSectionWithSound(advertisingRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToExhibition = useCallback(
+    () => scrollToSectionWithSound(exhibitionRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToDigital = useCallback(
+    () => scrollToSectionWithSound(digitalRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToCreative = useCallback(
+    () => scrollToSectionWithSound(creativeRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToOutdoor = useCallback(
+    () => scrollToSectionWithSound(outdoorRef),
+    [scrollToSectionWithSound]
+  );
+  const scrollToBecauseForUs = useCallback(
+    () => scrollToSectionWithSound(becauseForUsRef),
+    [scrollToSectionWithSound]
+  );
   return {
     // Refs
     aboutRef,
@@ -49,7 +109,7 @@ const useScrollToSection = () => {
     creativeRef,
     outdoorRef,
     becauseForUsRef,
-    
+
     // Scroll functions
     scrollToAbout,
     scrollToContact,
@@ -63,9 +123,12 @@ const useScrollToSection = () => {
     scrollToCreative,
     scrollToOutdoor,
     scrollToBecauseForUs,
-    
+
     // Generic scroll function
     scrollToSection,
+
+    // Sound function
+    mouseCLickRing,
   };
 };
 

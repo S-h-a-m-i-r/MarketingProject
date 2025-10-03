@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import book1 from "../assets/images/b1.png";
 import book2 from "../assets/images/b2.png";
 import book3 from "../assets/images/b3.png";
@@ -20,6 +20,7 @@ import contactVideo from "../assets/images/contactUs.mp4";
 import { IoMdMail } from "react-icons/io";
 import { MdLocalPhone } from "react-icons/md";
 import useScrollToSection from "../hooks/useScrollToSection";
+import cameraClickSound from "../assets/sounds/iphone-camera-capture-6448.mp3";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import HeroSection from "../components/HeroSection";
 import CompanyIntroSection from "../components/CompanyIntroSection";
@@ -27,6 +28,7 @@ import CameraModal from "../components/CameraModal";
 import UploadModal from "../components/UploadModal";
 import FooterSection from "../components/FooterSection";
 import SplineModel from "../components/SplineModel";
+import ClientInfoTooltip from "../components/ClientInfoTooltip";
 
 const LandingPage = () => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -35,6 +37,7 @@ const LandingPage = () => {
   const [_, setHasPlayedAboutVideo] = useState(false);
   const [showContactAnimation, setShowContactAnimation] = useState(false);
   const [contactAnimationPhase, setContactAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
+  const [isContactModelPreloaded, setIsContactModelPreloaded] = useState(false);
   const [showBecauseAnimation, setShowBecauseAnimation] = useState(false);
   const [becauseAnimationPhase, setBecauseAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
   const [showLoremAnimation, setShowLoremAnimation] = useState(false);
@@ -63,28 +66,46 @@ const LandingPage = () => {
     scrollToSeera,
     scrollToWhiteInk,
     scrollToBecauseForUs,
+    mouseCLickRing,
   } = useScrollToSection();
 
   const handleContactClick = () => {
     setClickedBook("contact");
     setShowContactAnimation(true);
     setContactAnimationPhase("scaling");
-    // Start scaling animation
-    setTimeout(() => {
-      setContactAnimationPhase("video");
-      // Fallback timeout - if model doesn't load properly, proceed after 8 seconds
+
+    // If model is preloaded, skip scaling and go directly to video
+    if (isContactModelPreloaded) {
       setTimeout(() => {
-        if (contactAnimationPhase === "video") {
-          console.log("Model timeout - proceeding to contact");
+        setContactAnimationPhase("video");
+        // Show model for 3 seconds then proceed
+        setTimeout(() => {
           setContactAnimationPhase("scrolling");
           scrollToContact();
           setTimeout(() => {
             setShowContactAnimation(false);
             setContactAnimationPhase("idle");
           }, 1000);
-        }
-      }, 8000); // 8 second fallback
-    }, 1000); // Scaling duration
+        }, 3000);
+      }, 500); // Short delay for smooth transition
+    } else {
+      // Original logic for when model is not preloaded
+      setTimeout(() => {
+        setContactAnimationPhase("video");
+        // Fallback timeout - if model doesn't load properly, proceed after 8 seconds
+        setTimeout(() => {
+          if (contactAnimationPhase === "video") {
+            console.log("Model timeout - proceeding to contact");
+            setContactAnimationPhase("scrolling");
+            scrollToContact();
+            setTimeout(() => {
+              setShowContactAnimation(false);
+              setContactAnimationPhase("idle");
+            }, 1000);
+          }
+        }, 8000);
+      }, 1000);
+    }
   };
 
   const handleBecauseClick = () => {
@@ -454,14 +475,24 @@ const LandingPage = () => {
       description: (
         <div className="flex   justify-end flex-col items-end space-y-6">
           <div className="flex flex-col items-center space-y-2">
-            <div className="bg-white p-2 rounded-lg">
-              <IoMdMail className="text-[#ad2b2b] text-2xl" />
-            </div>
+            <ClientInfoTooltip placement="top">
+              <div
+                className="bg-white p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                onClick={mouseCLickRing}
+              >
+                <IoMdMail className="text-[#ad2b2b] text-2xl" />
+              </div>
+            </ClientInfoTooltip>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <div className="bg-white p-2 rounded-lg">
-              <MdLocalPhone className="text-[#ad2b2b] text-2xl" />
-            </div>
+            <ClientInfoTooltip placement="top">
+              <div
+                className="bg-white p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                onClick={mouseCLickRing}
+              >
+                <MdLocalPhone className="text-[#ad2b2b] text-2xl" />
+              </div>
+            </ClientInfoTooltip>
           </div>
         </div>
       ),
@@ -500,6 +531,19 @@ const LandingPage = () => {
     }
   };
 
+  const playSound = useCallback(() => {
+    const audio = new Audio(cameraClickSound);
+    audio.volume = 0.5; // Set volume to 50%
+    audio.play().catch((error) => {
+      console.error("Error playing telephone ring sound:", error);
+    });
+
+    // Stop the audio after 3 seconds
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0; // Reset to beginning
+    }, 3000);
+  }, []);
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
@@ -511,6 +555,7 @@ const LandingPage = () => {
       context.drawImage(video, 0, 0);
 
       const imageData = canvas.toDataURL("image/png");
+      playSound();
       setCapturedImage(imageData);
       setShowCameraModal(false);
 
@@ -550,42 +595,51 @@ const LandingPage = () => {
 
   return (
     <>
+      {/* Preloaded Contact Model - Hidden initially */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -1 }}>
+        <SplineModel
+          sceneUrl="https://prod.spline.design/Iarp6JXqMCd9zBPJ/scene.splinecode"
+          className="w-full h-full"
+          preload={true}
+          isVisible={false}
+          onLoad={() => {
+            console.log("Contact model preloaded successfully");
+            setIsContactModelPreloaded(true);
+          }}
+          onError={(e) => {
+            console.error("Contact model preload error:", e);
+          }}
+        />
+      </div>
+
       <HeroSection
         navigationItems={navigationItems}
         capturedImage={capturedImage}
         handleCameraClick={handleCameraClick}
         scrollToAbout={scrollToAbout}
+        animationStates={{
+          showContactAnimation,
+          showBecauseAnimation,
+          showLoremAnimation,
+          showServicesAnimation,
+          showAboutAnimation,
+          showWhiteInkAnimation,
+        }}
       />
 
       {/* Contact Animation Overlay */}
       {showContactAnimation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
           <div className="relative">
-            {/* 3D Model Animation */}
+            {/* 3D Model Animation - Show immediately if preloaded */}
             {contactAnimationPhase === "video" && (
               <div className="relative">
                 <SplineModel
                   sceneUrl="https://prod.spline.design/Iarp6JXqMCd9zBPJ/scene.splinecode"
                   className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
-                  // clickedBook
-                  //   ? navigationItems.find(
-                  //       (item) =>
-                  //         (clickedBook === "contact" &&
-                  //           item.text === "CONTACT") ||
-                  //         (clickedBook === "because" &&
-                  //           item.text === "BECAUSE") ||
-                  //         (clickedBook === "lorem" &&
-                  //           item.text === "Lorem") ||
-                  //         (clickedBook === "services" &&
-                  //           item.text === "SERVICES") ||
-                  //         (clickedBook === "about" &&
-                  //           item.text === "ABOUT") ||
-                  //         (clickedBook === "whiteink" &&
-                  //           item.text === "WHITE INK")
-                  //     )?.color
-                  //   : "#0000"
                   bookColor={"#000"}
                   objectName="Book"
+                  isVisible={true}
                   onLoad={() => {
                     console.log("3D model loaded successfully");
                     // Auto-proceed after model loads
