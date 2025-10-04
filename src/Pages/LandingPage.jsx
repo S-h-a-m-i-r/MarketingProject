@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import book1 from "../assets/images/b1.png";
 import book2 from "../assets/images/b2.png";
 import book3 from "../assets/images/b3.png";
@@ -28,6 +28,10 @@ import CameraModal from "../components/CameraModal";
 import UploadModal from "../components/UploadModal";
 import FooterSection from "../components/FooterSection";
 import SplineModel from "../components/SplineModel";
+import ThreeJSModel from "../components/ThreeJSModel";
+import { preloadModel } from "../utils/modelUtils";
+import ClientInfoTooltip from "../components/ClientInfoTooltip";
+import contactModel from "../assets/models/6.glb";
 
 const LandingPage = () => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -36,7 +40,16 @@ const LandingPage = () => {
   const [_, setHasPlayedAboutVideo] = useState(false);
   const [showContactAnimation, setShowContactAnimation] = useState(false);
   const [contactAnimationPhase, setContactAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
+  const [isContactModelPreloaded, setIsContactModelPreloaded] = useState(false);
   const [showBecauseAnimation, setShowBecauseAnimation] = useState(false);
+  const [contactBookPosition, setContactBookPosition] = useState(null);
+
+  // Preload the contact model when component mounts
+  useEffect(() => {
+    console.log("Preloading contact model...");
+    preloadModel(contactModel);
+    setIsContactModelPreloaded(true);
+  }, []);
   const [becauseAnimationPhase, setBecauseAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
   const [showLoremAnimation, setShowLoremAnimation] = useState(false);
   const [loremAnimationPhase, setLoremAnimationPhase] = useState("idle");
@@ -71,22 +84,39 @@ const LandingPage = () => {
     setClickedBook("contact");
     setShowContactAnimation(true);
     setContactAnimationPhase("scaling");
-    // Start scaling animation
-    setTimeout(() => {
-      setContactAnimationPhase("video");
-      // Fallback timeout - if model doesn't load properly, proceed after 8 seconds
+
+    // If model is preloaded, skip scaling and go directly to video
+    if (isContactModelPreloaded) {
       setTimeout(() => {
-        if (contactAnimationPhase === "video") {
-          console.log("Model timeout - proceeding to contact");
+        setContactAnimationPhase("video");
+        // Show model for 3 seconds then proceed
+        setTimeout(() => {
           setContactAnimationPhase("scrolling");
           scrollToContact();
           setTimeout(() => {
             setShowContactAnimation(false);
             setContactAnimationPhase("idle");
           }, 1000);
-        }
-      }, 8000); // 8 second fallback
-    }, 1000); // Scaling duration
+        }, 3000);
+      }, 200); // Very short delay since model is preloaded
+    } else {
+      // For Three.js models, we can load them faster
+      setTimeout(() => {
+        setContactAnimationPhase("video");
+        // Fallback timeout - if model doesn't load properly, proceed after 3 seconds
+        setTimeout(() => {
+          if (contactAnimationPhase === "video") {
+            console.log("Model timeout - proceeding to contact");
+            setContactAnimationPhase("scrolling");
+            scrollToContact();
+            setTimeout(() => {
+              setShowContactAnimation(false);
+              setContactAnimationPhase("idle");
+            }, 1000);
+          }
+        }, 3000); // Reduced timeout for Three.js
+      }, 200); // Reduced delay for Three.js
+    }
   };
 
   const handleBecauseClick = () => {
@@ -201,6 +231,11 @@ const LandingPage = () => {
     }, 1000);
   };
 
+  // Callback to receive contact book position from HeroSection
+  const handleContactBookPositionChange = (position) => {
+    setContactBookPosition(position);
+  };
+
   // Navigation items data structure
   const navigationItems = [
     {
@@ -210,6 +245,7 @@ const LandingPage = () => {
       style: {
         backgroundImage: `url(${book5})`,
         fontSize: "clamp(12px, 1.2vw, 46px)",
+        overflow: "auto",
       },
       color: "black",
     },
@@ -456,14 +492,24 @@ const LandingPage = () => {
       description: (
         <div className="flex   justify-end flex-col items-end space-y-6">
           <div className="flex flex-col items-center space-y-2">
-            <div className="bg-white p-2 rounded-lg">
-              <IoMdMail className="text-[#ad2b2b] text-2xl" />
-            </div>
+            <ClientInfoTooltip placement="top">
+              <div
+                className="bg-white p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                onClick={mouseCLickRing}
+              >
+                <IoMdMail className="text-[#ad2b2b] text-2xl" />
+              </div>
+            </ClientInfoTooltip>
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <div className="bg-white p-2 rounded-lg">
-              <MdLocalPhone className="text-[#ad2b2b] text-2xl" />
-            </div>
+            <ClientInfoTooltip placement="top">
+              <div
+                className="bg-white p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                onClick={mouseCLickRing}
+              >
+                <MdLocalPhone className="text-[#ad2b2b] text-2xl" />
+              </div>
+            </ClientInfoTooltip>
           </div>
         </div>
       ),
@@ -566,44 +612,81 @@ const LandingPage = () => {
 
   return (
     <>
+      {/* Model is preloaded using useGLTF.preload() */}
+
       <HeroSection
         navigationItems={navigationItems}
         capturedImage={capturedImage}
         handleCameraClick={handleCameraClick}
         scrollToAbout={scrollToAbout}
+        onContactBookPositionChange={handleContactBookPositionChange}
+        animationStates={{
+          showContactAnimation,
+          showBecauseAnimation,
+          showLoremAnimation,
+          showServicesAnimation,
+          showAboutAnimation,
+          showWhiteInkAnimation,
+        }}
       />
 
       {/* Contact Animation Overlay */}
       {showContactAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
-          <div className="relative">
-            {/* 3D Model Animation */}
+        <div
+          className="w-full h-full fixed inset-0 z-[999999] bg-transparent"
+          style={{
+            overflow: "visible",
+            ...(contactBookPosition
+              ? {
+                  position: "fixed",
+                  top: contactBookPosition.viewportTop,
+                  left: contactBookPosition.viewportLeft,
+                  width: contactBookPosition.width,
+                  height: contactBookPosition.height,
+                  zIndex: 999999,
+                }
+              : {}),
+          }}
+        >
+          <div
+            className="relative w-full h-full"
+            style={{ overflow: "visible" }}
+          >
+            {/* Loading State */}
+
+            {/* 3D Model Animation - Show immediately if preloaded */}
             {contactAnimationPhase === "video" && (
-              <div className="relative">
-                <SplineModel
-                  sceneUrl="https://prod.spline.design/Iarp6JXqMCd9zBPJ/scene.splinecode"
-                  className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
-                  // clickedBook
-                  //   ? navigationItems.find(
-                  //       (item) =>
-                  //         (clickedBook === "contact" &&
-                  //           item.text === "CONTACT") ||
-                  //         (clickedBook === "because" &&
-                  //           item.text === "BECAUSE") ||
-                  //         (clickedBook === "lorem" &&
-                  //           item.text === "Lorem") ||
-                  //         (clickedBook === "services" &&
-                  //           item.text === "SERVICES") ||
-                  //         (clickedBook === "about" &&
-                  //           item.text === "ABOUT") ||
-                  //         (clickedBook === "whiteink" &&
-                  //           item.text === "WHITE INK")
-                  //     )?.color
-                  //   : "#0000"
-                  bookColor={"#000"}
+              <div
+                className="relative w-full h-full justify-center items-center"
+                style={{ overflow: "visible" }}
+              >
+                <ThreeJSModel
+                  modelPath={contactModel}
+                  className="w-full h-full rounded-lg shadow-2xl"
+                  style={{
+                    ...(contactBookPosition
+                      ? {
+                          position: "fixed",
+                          top: contactBookPosition.viewportTop,
+                          left: contactBookPosition.viewportLeft,
+                          width: contactBookPosition.width,
+                          height: contactBookPosition.height,
+                          zIndex: 999999,
+                          overflow: "visible",
+                        }
+                      : { overflow: "visible" }),
+                  }}
+                  bookColor={"#fff"}
                   objectName="Book"
+                  isVisible={true}
+                  enableControls={false}
+                  enableEnvironment={false}
+                  cameraPosition={[0, 0, 2]}
+                  cameraFov={20}
+                  autoPlayAnimations={true}
+                  animationSpeed={1.0}
                   onLoad={() => {
-                    console.log("3D model loaded successfully");
+                    console.log("3D model JS loaded successfully");
                     // Auto-proceed after model loads
                     setTimeout(() => {
                       setContactAnimationPhase("scrolling");
@@ -639,40 +722,38 @@ const LandingPage = () => {
       {showBecauseAnimation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
           <div className="relative">
+            <div className="relative">
+              <SplineModel
+                sceneUrl="https://prod.spline.design/4GWpSUZYplg2P30Z/scene.splinecode"
+                className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
+                objectName="Book"
+                onLoad={() => {
+                  console.log("3D model loaded successfully");
+                  setTimeout(() => {
+                    setBecauseAnimationPhase("scrolling");
+                    scrollToBecauseForUs();
+                    setTimeout(() => {
+                      setShowBecauseAnimation(false);
+                      setBecauseAnimationPhase("idle");
+                      setClickedBook(null);
+                    }, 1000);
+                  }, 3000);
+                }}
+                onError={(e) => {
+                  console.error("3D model error:", e);
+                  setTimeout(() => {
+                    setBecauseAnimationPhase("scrolling");
+                    scrollToBecauseForUs();
+                    setTimeout(() => {
+                      setShowBecauseAnimation(false);
+                      setBecauseAnimationPhase("idle");
+                      setClickedBook(null);
+                    }, 1000);
+                  }, 2000);
+                }}
+              />
+            </div>
             {/* 3D Model Animation */}
-            {becauseAnimationPhase === "video" && (
-              <div className="relative">
-                <SplineModel
-                  sceneUrl="https://prod.spline.design/4GWpSUZYplg2P30Z/scene.splinecode"
-                  className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
-                  objectName="Book"
-                  onLoad={() => {
-                    console.log("3D model loaded successfully");
-                    setTimeout(() => {
-                      setBecauseAnimationPhase("scrolling");
-                      scrollToBecauseForUs();
-                      setTimeout(() => {
-                        setShowBecauseAnimation(false);
-                        setBecauseAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 3000);
-                  }}
-                  onError={(e) => {
-                    console.error("3D model error:", e);
-                    setTimeout(() => {
-                      setBecauseAnimationPhase("scrolling");
-                      scrollToBecauseForUs();
-                      setTimeout(() => {
-                        setShowBecauseAnimation(false);
-                        setBecauseAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 2000);
-                  }}
-                />
-              </div>
-            )}
           </div>
         </div>
       )}

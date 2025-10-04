@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import landingBackground from "../assets/images/without draw.png";
 import clock from "../assets/images/11211.png";
 import phone from "../assets/images/tel.png";
@@ -13,53 +13,133 @@ import image10 from "../assets/images/images (10).png";
 import image14 from "../assets/images/images (14).png";
 import image15 from "../assets/images/images (15).png";
 import image16 from "../assets/images/images (16) 2.png";
-
+import phoneClickSound from "../assets/sounds/telephone-ring-313223.mp3";
+import useScrollToSection from "../hooks/useScrollToSection";
+import writingSound from "../assets/sounds/writing-on-paper-6988.mp3";
+import ClientInfoTooltip from "../components/ClientInfoTooltip";
 const HeroSection = ({
   navigationItems,
   capturedImage,
   handleCameraClick,
   scrollToAbout,
+  animationStates = {},
+  onContactBookPositionChange,
 }) => {
   // Array of images to cycle through
   const imageList = [whiteInkPng, image10, image14, image15, image16];
-
+  const { mouseCLickRing } = useScrollToSection();
   // State to track current image index
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // State for drawer animation
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  // State to store contact book position
+  const [contactBookPosition, setContactBookPosition] = useState(null);
 
   // Function to handle image click and cycle to next image
+
+  const handlephoneClick = () => {
+    playSound("phone");
+    scrollToAbout();
+  };
+
+  const playSound = useCallback((soundType = "") => {
+    const soundMap = {
+      phone: phoneClickSound,
+      writing: writingSound,
+    };
+
+    const soundFile = soundMap[soundType] || null;
+    if (!soundFile) return;
+
+    const audio = new Audio(soundFile);
+    audio.volume = 0.5; // Set volume to 50%
+
+    audio.play().catch((error) => {
+      console.error(`Error playing ${soundType} sound:`, error);
+    });
+
+    // Stop the audio after 3 seconds
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0; // Reset to beginning
+    }, 3000);
+  }, []);
+
   const handleImageClick = () => {
+    mouseCLickRing();
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
   };
 
-  // Effect to trigger animation when a new image is captured/uploaded
-  useEffect(() => {
-    if (capturedImage) {
-      // Reset states
-      setIsDrawerOpen(false);
-      setImageLoaded(false);
-
-      // Start animation sequence
-      const timer = setTimeout(() => {
-        setIsDrawerOpen(true);
-
-        // After drawer opens, show the image
-        const imageTimer = setTimeout(() => {
-          setImageLoaded(true);
-        }, 600);
-
-        return () => clearTimeout(imageTimer);
-      }, 300);
-
-      return () => clearTimeout(timer);
+  // Function to calculate and store contact book position
+  const calculateContactBookPosition = useCallback(() => {
+    const contactBookElement = document.querySelector('[data-book="contact"]');
+    if (contactBookElement) {
+      const rect = contactBookElement.getBoundingClientRect();
+      const position = {
+        top: rect.top,
+        left: rect.left,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2,
+        viewportTop: rect.top,
+        viewportLeft: rect.left,
+        pageTop: rect.top + window.scrollY,
+        pageLeft: rect.left + window.scrollX,
+      };
+      console.log("Contact Book Position:", position);
+      setContactBookPosition(position);
+      // Pass position to parent component
+      if (onContactBookPositionChange) {
+        onContactBookPositionChange(position);
+      }
+      return position;
     }
-  }, [capturedImage]);
+    return null;
+  }, [onContactBookPositionChange]);
+
+  // Calculate position when component mounts and on window resize
+  useEffect(() => {
+    const calculatePosition = () => {
+      setTimeout(() => {
+        calculateContactBookPosition();
+      }, 100);
+    };
+
+    calculatePosition();
+    window.addEventListener("resize", calculatePosition);
+
+    return () => {
+      window.removeEventListener("resize", calculatePosition);
+    };
+  }, [calculateContactBookPosition]);
+
+  // Expose the position to window for easy access in console
+  useEffect(() => {
+    if (contactBookPosition) {
+      window.contactBookPosition = contactBookPosition;
+    }
+  }, [contactBookPosition]);
 
   return (
     <div className="w-full bg-amber-100">
+      {/* Debug Panel for Contact Book Position */}
+      {contactBookPosition && (
+        <div className="fixed top-4 right-4 bg-black bg-opacity-80 text-white p-4 rounded-lg z-50 text-xs max-w-xs">
+          <h3 className="font-bold mb-2">Contact Book Position:</h3>
+          <div className="space-y-1">
+            <div>Top: {Math.round(contactBookPosition.top)}</div>
+            <div>Left: {Math.round(contactBookPosition.left)}</div>
+            <div>Center X: {Math.round(contactBookPosition.centerX)}</div>
+            <div>Center Y: {Math.round(contactBookPosition.centerY)}</div>
+            <div>Width: {Math.round(contactBookPosition.width)}</div>
+            <div>Height: {Math.round(contactBookPosition.height)}</div>
+            <div>Page Top: {Math.round(contactBookPosition.pageTop)}</div>
+            <div>Page Left: {Math.round(contactBookPosition.pageLeft)}</div>
+          </div>
+        </div>
+      )}
+
       <div className=" bg-amber-100 relative bg-no-repeat bg-fit flex flex-col max-sm:h-[100dvh]">
         <img
           src={landingBackground}
@@ -78,52 +158,78 @@ const HeroSection = ({
           2xl:pt-112 2xl:px-20
         "
         >
-          <div className="pl-10 pr-15 max-2xs:pr-40 2xl:pr-80 2xl:pl-80 flex items-center justify-between xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-1 md:pl-30 min-[390px]:translate-y-9 min-[430px]:translate-y-16 min-[428px]:translate-y-10  min-[375px]:-translate-y-6 lg:-mt-8 xl:-mt-28 min-[414px]:mt-4">
-            <img
-              src={clock}
-              alt="clock"
-              className=" h-20 ml-1 w-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-105 clock-hover-glow
+          <div className=" pl-10 pr-15 max-2xs:pr-40 2xl:pr-80 2xl:pl-80 flex items-center justify-between xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-1 md:pl-30">
+            <ClientInfoTooltip placement="top">
+              <img
+                src={clock}
+                alt="clock"
+                className=" h-20 ml-1 w-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-105 clock-hover-glow
                 sm:h-30 sm:w-20 md:h-35 md:w-30 lg:h-50 lg:w-35 xl:h-75 xl:w-50 2xl:h-80 2xl:w-60"
-            />
+                onClick={calculateContactBookPosition}
+              />
+            </ClientInfoTooltip>
             <div className="flex items-center justify-between xl:pr-10 lg:pr-10 md:pr-30 sm:pr-2 sm:gap-1 sm:justify-center">
-              {navigationItems.map((item, index) => (
-                <div
-                  key={index}
-                  className={`h-25 w-6 cursor-pointer bg-cover bg-center bg-no-repeat flex items-center justify-center relative group
-                   transition-all duration-300 ease-in-out hover:scale-y-105
-                   hover:shadow-[0_0_20px_5px_rgba(255,255,0,0.7)]
-                   ${"2xl:h-90 2xl:w-20 xl:h-80 xl:w-18 lg:h-50 lg:w-10 md:h-35 md:w-8 sm:h-30 sm:w-8"}`}
-                  style={{
-                    ...item.style,
-                    writingMode: "vertical-rl",
-                    textOrientation: "mixed",
-                    transform: "rotate(180deg)",
-                    color: "#E9E4DC",
-                    letterSpacing: "2px",
-                  }}
-                  onClick={item.onClick}
-                >
-                  {item.text}
-                  {/* Hover Frame */}
-                  <img
-                    src={hoverFrame}
-                    alt="hover frame"
-                    className="absolute w-full h-full  opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out pointer-events-none"
+              {navigationItems.map((item, index) => {
+                // Determine if this book should be hidden based on animation state
+                const isHidden =
+                  (item.text === "CONTACT" &&
+                    animationStates.showContactAnimation) ||
+                  (item.text === "BECAUSE" &&
+                    animationStates.showBecauseAnimation) ||
+                  (item.text === "Lorem" &&
+                    animationStates.showLoremAnimation) ||
+                  (item.text === "SERVICES" &&
+                    animationStates.showServicesAnimation) ||
+                  (item.text === "ABOUT" &&
+                    animationStates.showAboutAnimation) ||
+                  (item.text === "WHITE INK" &&
+                    animationStates.showWhiteInkAnimation);
+
+                return (
+                  <div
+                    key={index}
+                    data-book={item.text.toLowerCase()}
+                    className={`h-25 w-6 cursor-pointer bg-cover bg-center bg-no-repeat flex items-center justify-center relative group
+                     transition-all duration-300 ease-in-out hover:scale-y-105
+                     hover:shadow-[0_0_20px_5px_rgba(255,255,0,0.7)]
+                     ${
+                       isHidden
+                         ? "opacity-0 pointer-events-none"
+                         : "opacity-100"
+                     }
+                     ${"2xl:h-90 2xl:w-20 xl:h-80 xl:w-18 lg:h-50 lg:w-10 md:h-35 md:w-8 sm:h-30 sm:w-8"}`}
                     style={{
+                      ...item.style,
+                      writingMode: "vertical-rl",
+                      textOrientation: "mixed",
                       transform: "rotate(180deg)",
+                      color: "#E9E4DC",
+                      letterSpacing: "2px",
                     }}
-                  />
-                </div>
-              ))}
+                    onClick={item.onClick}
+                  >
+                    {item.text}
+                    {/* Hover Frame */}
+                    <img
+                      src={hoverFrame}
+                      alt="hover frame"
+                      className="absolute w-full h-full  opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out pointer-events-none"
+                      style={{
+                        transform: "rotate(180deg)",
+                      }}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className=" max-2xl:pr-20 pt-18 pr-10 pl-15 max-xs:pr-0 max-xs:pt-0 max-xs:pl-0 flex items-center justify-between xl:pt-40 lg:pt-20 2xl:pr-90 2xl:pl-80 xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-20 md:pl-30 md:pt-15 sm:pt-20 sm:pr-35 sm:pl-30 min-[390px]:translate-y-15  min-[414px]:mt-4 min-[375px]:-translate-y-8 min-[430px]:translate-y-26 min-[428px]:translate-y-16 lg:-mt-8 xl:-mt-16">
+          <div className=" max-2xl:pr-20 pt-18 pr-10 pl-15 max-xs:pr-0 max-xs:pt-0 max-xs:pl-0 flex items-center justify-between xl:pt-40 lg:pt-20 2xl:pr-90 2xl:pl-80 xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-20 md:pl-30 md:pt-15 sm:pt-20 sm:pr-35 sm:pl-30">
             <img
               src={phone}
               alt="phone"
               className=" h-15 ml-1 cursor-pointer transition-all duration-550 hover:ease-in-out hover:scale-y-103 phone-hover-glow
                2xl:h-75 2xl:ml-5 xl:h-65 xl:ml-4 lg:h-50 lg:ml-3 md:h-35 md:ml-2 sm:h-40 sm:ml-1"
-              onClick={scrollToAbout}
+              onClick={handlephoneClick}
             />
             <div className="flex flex-col items-center mt-[10px] 2xl:mt-[110px] xl:mt-[90px] lg:mt-[70px]  md:mt-[60px] sm:mt-[40px]">
               <img
@@ -131,6 +237,7 @@ const HeroSection = ({
                 alt="inkPot"
                 className=" h-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-103 inkpot-hover-glow
                  2xl:h-55 xl:h-45 lg:h-40 md:h-26 sm:h-30"
+                onClick={() => playSound("writing")}
               />
             </div>
             <div className="flex flex-col items-center cursor-pointer md:pr-15 lg:pr-10 ">
@@ -155,46 +262,32 @@ const HeroSection = ({
               />
             </div>
           </div>
-
-          <div className="max-2xl:pr-20 pr-0 pl-15 flex items-center justify-between pt-22 lg:pt-20 xl:pt-30 2xl:pr-90 2xl:pl-80 xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pr-25 md:pl-30 sm:pr-10 sm:pl-10 lg:mt-8 xl:mt-28 min-[375px]:-translate-y-92 min-[430px]:translate-y-6 min-[414px]:-mt-5 min-[390px]:translate-y-2">
-            {/* Camera - Keep exactly as is */}
+          <div className=" max-2xl:pr-20 pr-0 pl-15 flex items-center justify-between pt-22 lg:pt-20 xl:pt-30 2xl:pr-90 2xl:pl-80 xl:pr-60 xl:pl-60 lg:pr-40 lg:pl-40 md:pt-20 md:pr-25 md:pl-30 sm:pr-10 sm:pl-10">
             <div>
               <img
                 src={camera}
                 alt="camera"
-                className="h-15 cursor-pointer transition-all duration-550 hover:ease-in-out hover:scale-y-103 phone-hover-glow
-        2xl:h-70 2xl:ml-5 xl:h-60 xl:ml-4 lg:h-40 lg:ml-3 md:h-30 md:ml-2 sm:h-35 sm:ml-1 min-[390px]:-mt-90"
+                className=" h-15 cursor-pointer transition-all duration-550 hover:ease-in-out hover:scale-y-103 phone-hover-glow
+                 2xl:h-70 2xl:ml-5 xl:h-60 xl:ml-4 lg:h-40 lg:ml-3 md:h-30 md:ml-2 sm:h-35 sm:ml-1"
                 onClick={handleCameraClick}
               />
             </div>
-
-            {/* Center container - Fix the positioning context */}
-            <div className="grid grid-rows-[1fr_auto] items-center justify-items-center min-h-screen">
-              {/* InkPot in first row */}
+            <div className="flex relative flex-col items-center pt-55">
               <img
                 src={imageList[currentImageIndex]}
                 alt="inkPot"
-                className="h-15 cursor-pointer row-start-1 
-    2xl:h-60 xl:h-70 lg:h-60 md:h-40 sm:h-40 min-[390px]:-mt-165
-    lg:-mt-100" /* Reduce negative margin for laptop */
+                className=" h-15 cursor-pointer absolute top-0 left-0
+                 2xl:h-60 xl:h-70 lg:h-60 md:h-40 sm:h-40"
                 onClick={handleImageClick}
               />
-
-              {/* Seera in second row */}
               <img
                 src={seeraPng}
-                alt="seera"
-                className="h-15 row-start-2
-    2xl:h-18 2xl:w-60 
-    xl:h-70 
-    lg:h-60 lg:transform lg:-translate-y-110
-    md:h-40 
-    sm:h-40
-    hidden md:block"
+                alt="inkPot"
+                className=" h-15 cursor-pointer
+                 2xl:h-18 2xl:w-60 xl:h-70 lg:h-60 md:h-40 sm:h-40"
               />
             </div>
           </div>
-
           <div className="flex items-center pt-1 justify-between 2xl:pt-0 xl:pt-12 md:pt-0 sm:pt-0">
             <div
               style={{
@@ -203,37 +296,24 @@ const HeroSection = ({
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
-              className="ml-0 h-25 w-full relative overflow-hidden transition-all duration-500 ease-out
-              2xl:mr-45 2xl:ml-45 2xl:h-75
-              xl:mr-30 xl:ml-30 xl:h-65
-              lg:mr-20 lg:ml-20 lg:h-55 lg:-mt-110
-              sm:mr-5 sm:ml-5 sm:h-35
-              min-[390px]:-mt-37
-              min-[375px]:-mt-310
-              hover:scale-105 hover:z-20
-              min-[390px]:-mt-325
-              min-[414px]:-mt-337
-              min-[430px]:-mt-335"
+              className="ml-0 h-25 w-full relative
+                2xl:mr-45 2xl:ml-45 2xl:h-75
+                xl:mr-30 xl:ml-30 xl:h-65
+                lg:mr-20 lg:ml-20 lg:h-55
+                md:mr-10 md:ml-10 md:h-45
+                sm:mr-5 sm:ml-5 sm:h-35"
             >
               {capturedImage && (
                 <img
                   src={capturedImage}
                   alt="Captured/Uploaded"
-                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 object-fit rounded-lg transition-all duration-1000 ease-out
-        2xl:h-40 2xl:w-2/3    {/* 50% width */}
-        xl:h-35 xl:w-2/5      {/* 40% width */}
-        lg:h-30 lg:w-2/5      {/* 40% width */}
-        md:h-25 md:w-2/5      {/* 40% width */}
-        sm:h-20 sm:w-1/2      {/* 50% width */}
-        min-[390px]:h-15 min-[390px]:w-2/3
-        min-[375px]:h-12 min-[375px]:w-2/3
-        ${
-          imageLoaded
-            ? "opacity-100 -translate-y-1/2 scale-100"
-            : "opacity-0 -translate-y-1/4 scale-95"
-        }`}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-13 w-3/5 object-fit rounded-lg
+                    2xl:h-40 2xl:w-3/5
+                    xl:h-35 xl:w-2/5
+                    lg:h-30 lg:w-2/5
+                    md:h-25 md:w-1/2
+                    sm:h-20 sm:w-3/5"
                   style={{ zIndex: 10 }}
-                  onLoad={() => setImageLoaded(true)}
                 />
               )}
             </div>
