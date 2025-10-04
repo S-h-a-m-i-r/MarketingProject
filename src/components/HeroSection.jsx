@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import landingBackground from "../assets/images/without draw.png";
 import clock from "../assets/images/11211.png";
 import phone from "../assets/images/tel.png";
@@ -23,12 +23,15 @@ const HeroSection = ({
   handleCameraClick,
   scrollToAbout,
   animationStates = {},
+  onContactBookPositionChange,
 }) => {
   // Array of images to cycle through
   const imageList = [whiteInkPng, image10, image14, image15, image16];
   const { mouseCLickRing } = useScrollToSection();
-  // tate to track current image index
+  // State to track current image index
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // State to store contact book position
+  const [contactBookPosition, setContactBookPosition] = useState(null);
 
   // Function to handle image click and cycle to next image
 
@@ -65,8 +68,78 @@ const HeroSection = ({
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
   };
 
+  // Function to calculate and store contact book position
+  const calculateContactBookPosition = useCallback(() => {
+    const contactBookElement = document.querySelector('[data-book="contact"]');
+    if (contactBookElement) {
+      const rect = contactBookElement.getBoundingClientRect();
+      const position = {
+        top: rect.top,
+        left: rect.left,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2,
+        viewportTop: rect.top,
+        viewportLeft: rect.left,
+        pageTop: rect.top + window.scrollY,
+        pageLeft: rect.left + window.scrollX,
+      };
+      console.log("Contact Book Position:", position);
+      setContactBookPosition(position);
+      // Pass position to parent component
+      if (onContactBookPositionChange) {
+        onContactBookPositionChange(position);
+      }
+      return position;
+    }
+    return null;
+  }, [onContactBookPositionChange]);
+
+  // Calculate position when component mounts and on window resize
+  useEffect(() => {
+    const calculatePosition = () => {
+      setTimeout(() => {
+        calculateContactBookPosition();
+      }, 100);
+    };
+
+    calculatePosition();
+    window.addEventListener("resize", calculatePosition);
+
+    return () => {
+      window.removeEventListener("resize", calculatePosition);
+    };
+  }, [calculateContactBookPosition]);
+
+  // Expose the position to window for easy access in console
+  useEffect(() => {
+    if (contactBookPosition) {
+      window.contactBookPosition = contactBookPosition;
+    }
+  }, [contactBookPosition]);
+
   return (
     <div className="w-full bg-amber-100">
+      {/* Debug Panel for Contact Book Position */}
+      {contactBookPosition && (
+        <div className="fixed top-4 right-4 bg-black bg-opacity-80 text-white p-4 rounded-lg z-50 text-xs max-w-xs">
+          <h3 className="font-bold mb-2">Contact Book Position:</h3>
+          <div className="space-y-1">
+            <div>Top: {Math.round(contactBookPosition.top)}</div>
+            <div>Left: {Math.round(contactBookPosition.left)}</div>
+            <div>Center X: {Math.round(contactBookPosition.centerX)}</div>
+            <div>Center Y: {Math.round(contactBookPosition.centerY)}</div>
+            <div>Width: {Math.round(contactBookPosition.width)}</div>
+            <div>Height: {Math.round(contactBookPosition.height)}</div>
+            <div>Page Top: {Math.round(contactBookPosition.pageTop)}</div>
+            <div>Page Left: {Math.round(contactBookPosition.pageLeft)}</div>
+          </div>
+        </div>
+      )}
+
       <div className=" bg-amber-100 relative bg-no-repeat bg-fit flex flex-col max-sm:h-[100dvh]">
         <img
           src={landingBackground}
@@ -92,6 +165,7 @@ const HeroSection = ({
                 alt="clock"
                 className=" h-20 ml-1 w-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-105 clock-hover-glow
                 sm:h-30 sm:w-20 md:h-35 md:w-30 lg:h-50 lg:w-35 xl:h-75 xl:w-50 2xl:h-80 2xl:w-60"
+                onClick={calculateContactBookPosition}
               />
             </ClientInfoTooltip>
             <div className="flex items-center justify-between xl:pr-10 lg:pr-10 md:pr-30 sm:pr-2 sm:gap-1 sm:justify-center">
@@ -114,6 +188,7 @@ const HeroSection = ({
                 return (
                   <div
                     key={index}
+                    data-book={item.text.toLowerCase()}
                     className={`h-25 w-6 cursor-pointer bg-cover bg-center bg-no-repeat flex items-center justify-center relative group
                      transition-all duration-300 ease-in-out hover:scale-y-105
                      hover:shadow-[0_0_20px_5px_rgba(255,255,0,0.7)]

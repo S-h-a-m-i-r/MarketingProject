@@ -26,4 +26,5 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@splinetool/runtime", "@splinetool/react-spline"],
   },
+  assetsInclude: ["**/*.glb"],
 });
