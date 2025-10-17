@@ -12,6 +12,8 @@ function Model({
   isVisible = true,
   autoPlayAnimations = true,
   animationSpeed = 1.0,
+  animationDuration = null,
+  animationStartOffset = 0,
   ...props
 }) {
   const { scene, animations } = useGLTF(modelPath);
@@ -37,19 +39,58 @@ function Model({
       console.log(
         `Found ${animations.length} animations, starting playback...`
       );
+
+      // Clean up previous mixer if it exists
+      if (mixerRef.current) {
+        mixerRef.current.stopAllAction();
+        mixerRef.current = null;
+      }
+
       mixerRef.current = new THREE.AnimationMixer(scene);
       animations.forEach((clip, index) => {
         console.log(
           `Playing animation ${index + 1}: ${clip.name || "Unnamed"}`
         );
         const action = mixerRef.current.clipAction(clip);
+
+        // Reset animation to beginning
+        action.reset();
         action.setEffectiveTimeScale(animationSpeed);
+
+        // If animationStartOffset is specified, skip to that time
+        if (animationStartOffset && animationStartOffset > 0) {
+          action.time = animationStartOffset;
+        }
+
+        // If animationDuration is specified, crop the animation
+        if (animationDuration && animationDuration > 0) {
+          const originalDuration = clip.duration;
+          const durationRatio = animationDuration / originalDuration;
+          action.setDuration(animationDuration);
+          action.setEffectiveTimeScale(animationSpeed * durationRatio);
+        }
+
         action.play();
       });
     } else if (scene && animations && animations.length === 0) {
       console.log("No animations found in this model");
     }
-  }, [scene, animations, autoPlayAnimations, animationSpeed]);
+
+    // Cleanup function
+    return () => {
+      if (mixerRef.current) {
+        mixerRef.current.stopAllAction();
+        mixerRef.current = null;
+      }
+    };
+  }, [
+    scene,
+    animations,
+    autoPlayAnimations,
+    animationSpeed,
+    animationDuration,
+    animationStartOffset,
+  ]);
 
   // Change color of specific object
   useEffect(() => {
@@ -68,9 +109,7 @@ function Model({
   // Animation loop
   useFrame((state, delta) => {
     if (modelRef.current && isVisible) {
-      // Add a subtle floating motion (no rotation)
-      modelRef.current.position.y =
-        Math.sin(state.clock.elapsedTime * 2) * 0.05; // Gentle floating
+      // Removed floating motion - model stays in fixed position
       if (mixerRef.current) {
         mixerRef.current.update(delta);
       }
@@ -86,15 +125,13 @@ function Model({
   );
 }
 
-// Loading component
+// Loading component - must be a Three.js object for Canvas
 function LoadingFallback() {
   return (
-    <div className="flex items-center justify-center w-full h-full bg-transparent">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-        <p className="text-white text-sm">Loading 3D Model...</p>
-      </div>
-    </div>
+    <mesh>
+      <boxGeometry args={[0.1, 0.1, 0.1]} />
+      <meshBasicMaterial color="white" transparent opacity={0.5} />
+    </mesh>
   );
 }
 
@@ -108,9 +145,11 @@ const ThreeJSModel = ({
   enableControls = true,
   enableEnvironment = true,
   cameraPosition = [0, 0, 2],
-  cameraFov = 25,
+  cameraFov = 30,
   autoPlayAnimations = true,
   animationSpeed = 1.0,
+  animationDuration = null,
+  animationStartOffset = 0,
   onLoad,
   onError,
   ...props
@@ -181,6 +220,8 @@ const ThreeJSModel = ({
               isVisible={isVisible}
               autoPlayAnimations={autoPlayAnimations}
               animationSpeed={animationSpeed}
+              animationDuration={animationDuration}
+              animationStartOffset={animationStartOffset}
               {...props}
             />
           </Center>

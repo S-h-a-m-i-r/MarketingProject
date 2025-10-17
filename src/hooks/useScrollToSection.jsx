@@ -40,7 +40,6 @@ const useScrollToSection = () => {
   const scrollToSectionWithSound = useCallback(
     (ref) => {
       if (ref?.current) {
-        mouseCLickRing();
         scrollToSection(ref);
         ref;
       }

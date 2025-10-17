@@ -1,0 +1,594 @@
+
+/* Second row container - Hero Second Shelf */
+.secondShelf {
+  padding-top: 9rem;     /* pt-18 */
+  padding-right: 2.5rem;   /* pr-10 */
+  padding-left: 3.75rem;   /* pl-15 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ------------------ Responsive Breakpoints - Max Width Approach ------------------ */
+
+/* 2xl (≥1536px) - Default for largest screens */
+.secondShelf {
+  padding-right: 22.5rem; /* 2xl:pr-90 */
+  padding-left: 20rem;    /* 2xl:pl-80 */
+}
+
+/* xl (≤1535px) */
+@media (max-width: 1535px) {
+  .secondShelf {
+    padding-top: 10rem;     /* xl:pt-40 */
+    padding-right: 15rem;   /* xl:pr-60 */
+    padding-left: 15rem;    /* xl:pl-60 */
+  }
+}
+
+/* lg (≤1279px) */
+@media (max-width: 1279px) {
+  .secondShelf {
+    padding-top: 5rem;      /* lg:pt-20 */
+    padding-right: 10rem;   /* lg:pr-40 */
+    padding-left: 10rem;    /* lg:pl-40 */
+  }
+}
+
+/* md (≤1023px) */
+@media (max-width: 1023px) {
+  .secondShelf {
+    padding-top: 3.75rem;   /* md:pt-15 */
+    padding-right: 5rem;    /* md:pr-20 */
+    padding-left: 7.5rem;   /* md:pl-30 */
+  }
+}
+
+/* sm (≤767px) */
+@media (max-width: 767px) {
+  .secondShelf {
+    padding-top: 5rem;      /* sm:pt-20 */
+    padding-right: 8.75rem; /* sm:pr-35 */
+    padding-left: 7.5rem;   /* sm:pl-30 */
+  }
+}
+
+/* xs (≤639px) */
+@media (max-width: 639px) {
+  .secondShelf {
+    padding-top: 4.5rem;    /* base pt-18 */
+    padding-right: 2.5rem;  /* base pr-10 */
+    padding-left: 3.75rem;  /* base pl-15 */
+  }
+}
+
+/* max-xs (≤475px) */
+@media (max-width: 475px) {
+  .secondShelf {     /* max-xs:pr-0 */
+    padding-top: 7rem;        /* max-xs:pt-0 */
+    /* padding: 2rem rem;       max-xs:pl-0 */
+  }
+}
+
+
+.thirdShelf {
+  padding-right: 0;           /* pr-0 */
+  padding-left: 3.75rem;      /* pl-15 */
+  padding-top: 5.5rem;        /* pt-22 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ------------------ Responsive Breakpoints - Max Width Approach ------------------ */
+
+/* 2xl (≥1536px) - Default for largest screens */
+.thirdShelf {
+  padding-right: 22.5rem;     /* 2xl:pr-90 */
+  padding-left: 20rem;        /* 2xl:pl-80 */
+}
+
+/* xl (≤1535px) */
+@media (max-width: 1535px) {
+  .thirdShelf {
+    padding-top: 7.5rem;      /* xl:pt-30 */
+    padding-right: 15rem;     /* xl:pr-60 */
+    padding-left: 15rem;      /* xl:pl-60 */
+  }
+}
+
+/* lg (≤1279px) */
+@media (max-width: 1279px) {
+  .thirdShelf {
+    padding-top: 5rem;        /* lg:pt-20 */
+    padding-right: 10rem;     /* lg:pr-40 */
+    padding-left: 10rem;      /* lg:pl-40 */
+  }
+}
+
+/* md (≤1023px) */
+@media (max-width: 1023px) {
+  .thirdShelf {
+    padding-top: 5rem;        /* md:pt-20 */
+    padding-right: 6.25rem;   /* md:pr-25 */
+    padding-left: 7.5rem;     /* md:pl-30 */
+  }
+}
+
+/* sm (≤767px) */
+@media (max-width: 767px) {
+  .thirdShelf {
+    padding-right: 2.5rem;    /* sm:pr-10 */
+    padding-left: 2.5rem;     /* sm:pl-10 */
+  }
+}
+
+/* xs (≤639px) */
+@media (max-width: 639px) {
+  .thirdShelf {
+    padding-right: 0;         /* base pr-0 */
+    padding-left: 3.75rem;    /* base pl-15 */
+    padding-top: 5.5rem;      /* base pt-22 */
+  }
+}
+@media (max-width: 475px) {
+  .thirdShelf {     /* max-xs:pr-0 */
+    padding-top: 4rem;        /* max-xs:pt-0 */
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+
+.thirdShelfCamera {
+  height: 3.75rem;             /* h-15 */
+  cursor: pointer;
+  transition: all 550ms;       /* transition-all duration-550 */
+}
+
+.thirdShelfCamera:hover {
+  transition-timing-function: ease-in-out; /* hover:ease-in-out */
+  transform: scaleY(1.03);                /* hover:scale-y-103 */
+}
+
+/* Custom effect class (keep existing Tailwind glow or replace if you have it defined) */
+.thirdShelfCamera.phone-hover-glow {
+  /* Keep your existing glow definition */
+}
+
+/* ------------------ Responsive Breakpoints - Max Width Approach ------------------ */
+
+/* 2xl (≥1536px) - Default for largest screens */
+.thirdShelfCamera {
+  height: 17.5rem;             /* 2xl:h-70 */
+  margin-left: 1.25rem;        /* 2xl:ml-5 */
+}
+
+/* xl (≤1535px) */
+@media (max-width: 1535px) {
+  .thirdShelfCamera {
+    height: 15rem;             /* xl:h-60 */
+    margin-left: 1rem;         /* xl:ml-4 */
+  }
+}
+
+/* lg (≤1279px) */
+@media (max-width: 1279px) {
+  .thirdShelfCamera {
+    height: 10rem;             /* lg:h-40 */
+    margin-left: 0.75rem;      /* lg:ml-3 */
+  }
+}
+
+/* md (≤1023px) */
+@media (max-width: 1023px) {
+  .thirdShelfCamera {
+    height: 7.5rem;            /* md:h-30 */
+    margin-left: 0.5rem;       /* md:ml-2 */
+  }
+}
+
+/* sm (≤767px) */
+@media (max-width: 767px) {
+  .thirdShelfCamera {
+    height: 8.75rem;           /* sm:h-35 */
+    margin-left: 0.25rem;      /* sm:ml-1 */
+  }
+}
+
+/* xs (≤639px) */
+@media (max-width: 639px) {
+  .thirdShelfCamera {
+    height: 3.75rem;           /* base h-15 */
+    margin-left: 0;            /* base ml-0 */
+  }
+}
+
+
+
+
+/* ------------------ Responsive Breakpoints - Max Width Approach ------------------ */
+
+/* 2xl (≥1536px) - Default for largest screens */
+.thirdShelfSeeraBox {
+  height: 4.75rem;    /* 2xl:h-18 */
+  width: 20rem;    
+}
+
+/* xl (≤1535px) */
+@media (max-width: 1535px) {
+  .thirdShelfSeeraBox {
+    height: 5.5rem; /* xl:h-70 */
+  }
+}
+
+/* lg (≤1279px) */
+@media (max-width: 1279px) {
+  .thirdShelfSeeraBox {
+    height: 15rem;   /* lg:h-60 */
+  }
+}
+
+/* md (≤1023px) */
+@media (max-width: 1024px) {
+  .thirdShelfSeeraBox {
+    height: 5rem;
+    width: 15rem;   /* md:h-40 */
+  }
+}
+
+/* sm (≤767px) */
+@media (max-width: 768px) {
+  .thirdShelfSeeraBox {
+    height: 4rem;  
+    width: 10rem; /* sm:h-40 */
+  }
+}
+
+/* xs (≤639px) */
+@media (max-width: 639px) {
+  .thirdShelfSeeraBox {
+    height: 3.75rem; /* base h-15 */
+  }
+}
+
+@media (max-width: 500px) {
+  .thirdShelfSeeraBox {
+    height: 3.75rem; /* base h-15 */
+  }
+}
+
+
+
+/* ------------------ Responsive Breakpoints - Max Width Approach ------------------ */
+
+/* 2xl (≥1536px) - Default for largest screens */
+.thirdShelfSeeraBoxInkPot {
+  position: absolute;
+  height: 14rem;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 20;     /* 2xl:h-60 */
+}
+
+/* xl (≤1535px) */
+@media (min-width: 1535px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 13rem;
+    top: 10px /* xl:h-70 */
+  }
+}
+@media (max-width: 1535px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 13rem;
+    top: 10px /* xl:h-70 */
+  }
+}
+
+/* lg (≤1279px) */
+@media (max-width: 1279px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 10rem;
+    top: -30px;   /* lg:h-60 */
+  }
+}
+
+/* md (≤1023px) */
+@media (max-width: 1023px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 10rem;   /* md:h-40 */
+  }
+}
+
+/* sm (≤767px) */
+@media (max-width: 768px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 10rem;   /* sm:h-40 */
+  }
+}
+
+/* xs (≤639px) */
+@media (max-width: 639px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 3.75rem; /* base h-15 */
+  }
+}
+@media (min-width: 400px) and (max-width: 450px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+}
+@media (min-width: 450px) and (max-width: 500px) {
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+}
+
+/* First Shelf - Interior Container */
+.firstShelf {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100dvh;
+  padding-top: 9.25rem;  /* pt-37 */
+  padding-left: 2.5rem;  /* px-10 */
+  padding-right: 2.5rem; /* px-10 */
+}
+
+/* ------------------ Responsive Breakpoints - Max Width Approach ------------------ */
+
+/* 2xl (≥1536px) - Default for largest screens */
+.firstShelf {
+  padding-top: 28rem;    /* 2xl:pt-112 */
+  padding-left: 5rem;    /* 2xl:px-20 */
+  padding-right: 5rem;   /* 2xl:px-20 */
+}
+
+/* xl (≤1535px) */
+@media (max-width: 1535px) {
+  .firstShelf {
+    padding-top: 25.5rem; /* xl:pt-102 */
+    padding-left: 7.5rem; /* xl:px-30 */
+    padding-right: 7.5rem; /* xl:px-30 */
+  }
+}
+
+/* lg (≤1279px) */
+@media (max-width: 1279px) {
+  .firstShelf {
+    padding-top: 19.5rem; /* lg:pt-78 */
+    padding-left: 6rem;   /* lg:px-24 */
+    padding-right: 6rem;  /* lg:px-24 */
+  }
+}
+
+/* md (≤1023px) */
+@media (max-width: 1023px) {
+  .firstShelf {
+    padding-top: 15.5rem; /* md:pt-62 */
+    padding-left: 5rem;   /* md:px-20 */
+    padding-right: 5rem;  /* md:px-20 */
+  }
+}
+
+/* sm (≤639px) */
+@media (max-width: 639px) {
+  .firstShelf {
+    padding-top: 10rem;   /* sm:pt-40 */
+    padding-left: 2.5rem; /* sm:px-10 */
+    padding-right: 2.5rem; /* sm:px-10 */
+  }
+}
+
+/* xs (≤475px) */
+@media (min-width: 450px) and (max-width: 500px) {
+  .firstShelf {
+    padding-top: 15.5rem; /* base pt-37 */
+    padding-left: 2.5rem; /* base px-10 */
+    padding-right: 2.5rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 8.5rem;     /* pt-18 */
+    padding-right: 2.5rem;   /* pr-10 */
+    padding-left: 3.75rem;
+    
+  }
+  .thirdShelf {
+    padding-top: 6.5rem;        /* pt-22 */
+    padding-right: 3rem;           /* pr-0 */
+    padding-left: 3.75rem; 
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBox {
+    height: 3rem; /* base h-15 */
+  }
+}
+@media (min-width: 800px) and (max-width: 850px) {
+  .firstShelf {
+    padding-top: 16.8rem; /* base pt-37 */
+    padding-left: 6rem; /* base px-10 */
+    padding-right: 6.3rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 5.5rem;     /* pt-18 */
+    padding-right: 4.5rem;   /* pr-10 */
+    padding-left: 7.75rem;
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelf{
+        padding-top: 4.5rem;
+        padding-right: 7.5rem;
+  }
+
+  .thirdShelfCamera {
+    height: 6.2rem;
+  }
+  .thirdShelfSeeraBox {
+    height: 3.2rem;
+    width: 13rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 8rem;
+    top: -15px;
+     /* base h-15 */
+  }
+}
+@media (min-width: 400px) and (max-width: 449px) {
+  .firstShelf {
+    padding-top: 13.2rem; /* base pt-37 */
+    padding-left: 2.5rem; /* base px-10 */
+    padding-right: 2.5rem; /* base px-10 */
+  }
+  .thirdShelf{
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelfSeeraBox {
+    height: 3.2rem; /* base h-15 */
+  }
+}
+@media (min-width: 380px) and (max-width: 399px) {
+  .firstShelf {
+    padding-top: 11.5rem; /* base pt-37 */
+    padding-left: 2.5rem; /* base px-10 */
+    padding-right: 2.5rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 6.3rem;     /* pt-18 */
+    padding-right: 2.5rem;   /* pr-10 */
+    padding-left: 3.75rem;
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelf {
+    padding-top: 3rem;        /* pt-22 */
+    padding-right: 2rem;           /* pr-0 */
+    padding-left: 2rem; 
+    /* padding-bottom: 0.7rem; */
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBox {
+    height: 3rem; /* base h-15 */
+  }
+}
+@media (min-width: 360px) and (max-width: 379px) {
+  .firstShelf {
+    padding-top: 10.5rem; /* base pt-37 */
+    padding-left: 2.5rem; /* base px-10 */
+    padding-right: 2.5rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 6.3rem;     /* pt-18 */
+    padding-right: 2.5rem;   /* pr-10 */
+    padding-left: 3.75rem;
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelf {
+    padding-top: 3rem;        /* pt-22 */
+    padding-right: 2rem;           /* pr-0 */
+    padding-left: 2rem; 
+    /* padding-bottom: 0.7rem; */
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBox {
+    height: 3rem; /* base h-15 */
+  }
+}
+@media (min-width: 350px) and (max-width: 369px) {
+  .firstShelf {
+    padding-top: 10rem; /* base pt-37 */
+    padding-left: 1rem; /* base px-10 */
+    padding-right: 1rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 5rem;     /* pt-18 */
+    padding-right: 4.5rem;   /* pr-10 */
+    padding-left: 3.75rem;
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelf {
+    padding-top: 3rem;        /* pt-22 */
+    padding-right: 2.7rem;           /* pr-0 */
+    padding-left: 2rem; 
+    /* padding-bottom: 0.7rem; */
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBox {
+    height: 2.7rem; /* base h-15 */
+    width: 9.2rem;
+  }
+}
+
+/* Music control icon styling */
+.music-control-icon {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.75);
+  border-radius: 50%;
+  padding: 0.25rem;
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.music-control-icon:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.music-control-icon svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: white;
+  transition: color 0.2s ease-in-out;
+}
+
+.music-control-icon:hover svg {
+  color: #fbbf24; /* yellow-300 */
+}
+
+/* Responsive music icon sizing */
+@media (max-width: 1535px) {
+  .music-control-icon {
+    top: 0.2rem;
+    right: 0.2rem;
+    padding: 0.2rem;
+  }
+  .music-control-icon svg {
+    width: 0.6rem;
+    height: 0.6rem;
+  }
+}
+
+@media (max-width: 1279px) {
+  .music-control-icon {
+    top: 0.15rem;
+    right: 0.15rem;
+    padding: 0.15rem;
+  }
+  .music-control-icon svg {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .music-control-icon {
+    top: 0.1rem;
+    right: 0.1rem;
+    padding: 0.1rem;
+  }
+  .music-control-icon svg {
+    width: 0.4rem;
+    height: 0.4rem;
+  }
+}

@@ -1,4 +1,10 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 import book1 from "../assets/images/b1.png";
 import book2 from "../assets/images/b2.png";
 import book3 from "../assets/images/b3.png";
@@ -27,11 +33,16 @@ import CompanyIntroSection from "../components/CompanyIntroSection";
 import CameraModal from "../components/CameraModal";
 import UploadModal from "../components/UploadModal";
 import FooterSection from "../components/FooterSection";
-import SplineModel from "../components/SplineModel";
 import ThreeJSModel from "../components/ThreeJSModel";
 import { preloadModel } from "../utils/modelUtils";
 import ClientInfoTooltip from "../components/ClientInfoTooltip";
-import contactModel from "../assets/models/6.glb";
+import contactModel from "../assets/models/Contact.glb";
+import phone from "../assets/sounds/mouse-click-153941.mp3";
+import becauseModel from "../assets/models/Because.glb";
+import loremModel from "../assets/models/black.glb";
+import serviceModel from "../assets/models/service.glb";
+import aboutModel from "../assets/models/about.glb";
+import whiteInkModel from "../assets/models/WhiteInk.glb";
 
 const LandingPage = () => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -40,16 +51,26 @@ const LandingPage = () => {
   const [_, setHasPlayedAboutVideo] = useState(false);
   const [showContactAnimation, setShowContactAnimation] = useState(false);
   const [contactAnimationPhase, setContactAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
-  const [isContactModelPreloaded, setIsContactModelPreloaded] = useState(false);
   const [showBecauseAnimation, setShowBecauseAnimation] = useState(false);
   const [contactBookPosition, setContactBookPosition] = useState(null);
+  const [aboutBookPosition, setAboutBookPosition] = useState(null);
+  const [becauseBookPosition, setBecauseBookPosition] = useState(null);
+  const [loremBookPosition, setLoremBookPosition] = useState(null);
+  const [servicesBookPosition, setServicesBookPosition] = useState(null);
+  const [whiteInkBookPosition, setWhiteInkBookPosition] = useState(null);
 
-  // Preload the contact model when component mounts
+  // Preload all models when component mounts
   useEffect(() => {
-    console.log("Preloading contact model...");
+    console.log("Preloading all models...");
     preloadModel(contactModel);
-    setIsContactModelPreloaded(true);
+    preloadModel(becauseModel);
+    preloadModel(loremModel);
+    preloadModel(serviceModel);
+    preloadModel(aboutModel);
+    preloadModel(whiteInkModel);
   }, []);
+
+  
   const [becauseAnimationPhase, setBecauseAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
   const [showLoremAnimation, setShowLoremAnimation] = useState(false);
   const [loremAnimationPhase, setLoremAnimationPhase] = useState("idle");
@@ -59,7 +80,7 @@ const LandingPage = () => {
   const [aboutAnimationPhase, setAboutAnimationPhase] = useState("idle");
   const [showWhiteInkAnimation, setShowWhiteInkAnimation] = useState(false);
   const [whiteInkAnimationPhase, setWhiteInkAnimationPhase] = useState("idle");
-  const [clickedBook, setClickedBook] = useState(null); // Track which book was clicked
+  const [, setClickedBook] = useState(null); // Track which book was clicked
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -80,227 +101,373 @@ const LandingPage = () => {
     mouseCLickRing,
   } = useScrollToSection();
 
-  const handleContactClick = () => {
+  const playClickSound = useCallback(() => {
+    const audio = new Audio(phone);
+    audio.volume = 0.5; // Set volume to 50%
+    audio.play().catch((error) => {
+      console.error("Error playing telephone ring sound:", error);
+    });
+
+    // Stop the audio after 3 seconds
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0; // Reset to beginning
+    }, 3000);
+  }, []);
+
+  // Function to play Invisible Beauty sound with queue management
+  
+
+  const handleContactClick = useCallback(() => {
+    // Prevent multiple clicks during animation
+    if (showContactAnimation) return;
+    playClickSound();
+
     setClickedBook("contact");
     setShowContactAnimation(true);
     setContactAnimationPhase("scaling");
+    
 
-    // If model is preloaded, skip scaling and go directly to video
-    if (isContactModelPreloaded) {
-      setTimeout(() => {
-        setContactAnimationPhase("video");
-        // Show model for 3 seconds then proceed
-        setTimeout(() => {
-          setContactAnimationPhase("scrolling");
-          scrollToContact();
-          setTimeout(() => {
-            setShowContactAnimation(false);
-            setContactAnimationPhase("idle");
-          }, 1000);
-        }, 3000);
-      }, 200); // Very short delay since model is preloaded
-    } else {
-      // For Three.js models, we can load them faster
-      setTimeout(() => {
-        setContactAnimationPhase("video");
-        // Fallback timeout - if model doesn't load properly, proceed after 3 seconds
-        setTimeout(() => {
-          if (contactAnimationPhase === "video") {
-            console.log("Model timeout - proceeding to contact");
-            setContactAnimationPhase("scrolling");
-            scrollToContact();
-            setTimeout(() => {
-              setShowContactAnimation(false);
-              setContactAnimationPhase("idle");
-            }, 1000);
-          }
-        }, 3000); // Reduced timeout for Three.js
-      }, 200); // Reduced delay for Three.js
-    }
-  };
+    // Scale animation for 3 seconds, then show model
+    setTimeout(() => {
+      // setContactAnimationPhase("video");
+      // Show model for 3 seconds then proceed
+      setShowContactAnimation(false);
+          setContactAnimationPhase("idle");
+      scrollToContact();
+          setClickedBook(null);
+          setContactBookPosition(null);
+      // setTimeout(() => {
+      //   setContactAnimationPhase("scrolling");
+      //   // scrollToContact();
+      //   setTimeout(() => {
+      //     setShowContactAnimation(false);
+      //     setContactAnimationPhase("idle");
+      //     setClickedBook(null);
+      //     setContactBookPosition(null);
+      //     // Don't reset animationKey - let it keep incrementing
+      //   }, 500);
+      // }, 7000);
+    }, 2000);
+    
+  }, [showContactAnimation]);
 
-  const handleBecauseClick = () => {
+  const handleBecauseClick = useCallback(() => {
+    // Prevent multiple clicks during animation
+    if (showBecauseAnimation) return;
+    playClickSound();
+
     setClickedBook("because");
     setShowBecauseAnimation(true);
     setBecauseAnimationPhase("scaling");
+    
 
-    // Start scaling animation
+    // Scale animation for 3 seconds, then show model
     setTimeout(() => {
-      setBecauseAnimationPhase("video");
+      // setBecauseAnimationPhase("video");
+      setShowBecauseAnimation(false);
+      setBecauseAnimationPhase("idle");
+      scrollToBecauseForUs();
+      setClickedBook(null);
+      setBecauseBookPosition(null);
+      // Show model for 3 seconds then proceed
+      // setTimeout(() => {
+      //   setBecauseAnimationPhase("scrolling");
+      //   scrollToBecauseForUs();
+      //   setTimeout(() => {
+      //     setShowBecauseAnimation(false);
+      //     setBecauseAnimationPhase("idle");
+      //     setClickedBook(null);
+      //     setBecauseBookPosition(null);
+      //     // Don't reset animationKey - let it keep incrementing
+      //   }, 500);
+      // }, 7000);
+    }, 2000);
+  }, [showBecauseAnimation, playClickSound, scrollToBecauseForUs]);
 
-      // Fallback timeout - if video doesn't end naturally, proceed after 10 seconds
-      setTimeout(() => {
-        if (becauseAnimationPhase === "video") {
-          console.log("Video timeout - proceeding to because");
-          setBecauseAnimationPhase("scrolling");
-          scrollToBecauseForUs();
-          setTimeout(() => {
-            setShowBecauseAnimation(false);
-            setBecauseAnimationPhase("idle");
-          }, 1000);
-        }
-      }, 10000); // 10 second fallback
-    }, 1000); // Scaling duration
-  };
+  const handleLoremClick = useCallback(() => {
+    // Prevent multiple clicks during animation
+    if (showLoremAnimation) return;
+    playClickSound();
 
-  const handleLoremClick = () => {
     setClickedBook("lorem");
     setShowLoremAnimation(true);
     setLoremAnimationPhase("scaling");
+    
 
+    // Scale animation for 3 seconds, then show model
     setTimeout(() => {
-      setLoremAnimationPhase("video");
+      // setLoremAnimationPhase("video");
+      // Show model for 3 seconds then proceed
+      // setTimeout(() => {
+      //   setLoremAnimationPhase("scrolling");
+      //   scrollToSeera();
+      //   setTimeout(() => {
+      //     setShowLoremAnimation(false);
+      //     setLoremAnimationPhase("idle");
+      //     setClickedBook(null);
+      //     setLoremBookPosition(null);
+      //     // Don't reset animationKey - let it keep incrementing
+      //   }, 500);
+      // }, 7000);
+      setShowLoremAnimation(false);
+      setLoremAnimationPhase("idle");
+      scrollToSeera();
+      setClickedBook(null);
+      setLoremBookPosition(null);
+    }, 2000);
+  }, [showLoremAnimation, playClickSound, scrollToSeera]);
 
-      setTimeout(() => {
-        if (loremAnimationPhase === "video") {
-          console.log("Video timeout - proceeding to lorem");
-          setLoremAnimationPhase("scrolling");
-          scrollToSeera();
-          setTimeout(() => {
-            setShowLoremAnimation(false);
-            setLoremAnimationPhase("idle");
-          }, 1000);
-        }
-      }, 10000);
-    }, 1000);
-  };
+  const handleServicesClick = useCallback(() => {
+    // Prevent multiple clicks during animation
+    if (showServicesAnimation) return;
+    playClickSound();
 
-  const handleServicesClick = () => {
     setClickedBook("services");
     setShowServicesAnimation(true);
     setServicesAnimationPhase("scaling");
+    
 
+    // Scale animation for 3 seconds, then show model
     setTimeout(() => {
-      setServicesAnimationPhase("video");
-
-      setTimeout(() => {
-        if (servicesAnimationPhase === "video") {
-          console.log("Video timeout - proceeding to services");
-          setServicesAnimationPhase("scrolling");
+      setShowServicesAnimation(false);
+          setServicesAnimationPhase("idle");
           scrollToWhiteInk();
-          setTimeout(() => {
-            setShowServicesAnimation(false);
-            setServicesAnimationPhase("idle");
-          }, 1000);
-        }
-      }, 10000);
-    }, 1000);
-  };
+          setClickedBook(null);
+          setServicesBookPosition(null);
+      // setServicesAnimationPhase("video");
+      // Show model for 3 seconds then proceed
+      // setTimeout(() => {
+      //   setServicesAnimationPhase("scrolling");
+      //   scrollToWhiteInk();
+      //   setTimeout(() => {
+      //     setShowServicesAnimation(false);
+      //     setServicesAnimationPhase("idle");
+      //     setClickedBook(null);
+      //     setServicesBookPosition(null);
+      //     // Don't reset animationKey - let it keep incrementing
+      //   }, 500);
+      // }, 7000);
+    }, 2000);
+  }, [showServicesAnimation, playClickSound, scrollToWhiteInk]);
 
-  const handleAboutClick = () => {
+  const handleAboutClick = useCallback(() => {
+    // Prevent multiple clicks during animation
+    if (showAboutAnimation) return;
+    playClickSound();
+
     setClickedBook("about");
     setShowAboutAnimation(true);
     setAboutAnimationPhase("scaling");
+    
 
+    // Scale animation for 3 seconds, then show model
     setTimeout(() => {
-      setAboutAnimationPhase("video");
+      // setAboutAnimationPhase("video");
+      // Show model for 3 seconds then proceed
+      // setTimeout(() => {
+      //   setAboutAnimationPhase("scrolling");
+      //   scrollToAbout();
+      //   setTimeout(() => {
+      //     setShowAboutAnimation(false);
+      //     setAboutAnimationPhase("idle");
+      //     setClickedBook(null);
+      //     setBecauseBookPosition(null);
+      //     // Don't reset animationKey - let it keep incrementing
+      //   }, 500);
+      // }, 7000);
+      setShowAboutAnimation(false);
+      setAboutAnimationPhase("idle");
+      scrollToAbout();
+      setClickedBook(null);
+      setBecauseBookPosition(null);
+    }, 2000);
+  }, [showAboutAnimation, playClickSound, scrollToAbout]);
 
-      setTimeout(() => {
-        if (aboutAnimationPhase === "video") {
-          console.log("Video timeout - proceeding to about");
-          setAboutAnimationPhase("scrolling");
-          scrollToAbout();
-          setTimeout(() => {
-            setShowAboutAnimation(false);
-            setAboutAnimationPhase("idle");
-          }, 1000);
-        }
-      }, 10000);
-    }, 1000);
-  };
+  const handleWhiteInkClick = useCallback(() => {
+    // Prevent multiple clicks during animation
+    if (showWhiteInkAnimation) return;
+    playClickSound();
 
-  const handleWhiteInkClick = () => {
+    // Play Invisible Beauty sound
+    
+
     setClickedBook("whiteink");
     setShowWhiteInkAnimation(true);
     setWhiteInkAnimationPhase("scaling");
-
+    
+    // Scale animation for 3 seconds, then show model
     setTimeout(() => {
-      setWhiteInkAnimationPhase("video");
-
-      setTimeout(() => {
-        if (whiteInkAnimationPhase === "video") {
-          console.log("Video timeout - proceeding to white ink");
-          setWhiteInkAnimationPhase("scrolling");
+      // setWhiteInkAnimationPhase("video");
+      // Show model for 3 seconds then proceed
+      // setTimeout(() => {
+      //   setWhiteInkAnimationPhase("scrolling");
+      //   scrollToWhiteInk();
+      //   setTimeout(() => {
+      //     setShowWhiteInkAnimation(false);
+      //     setWhiteInkAnimationPhase("idle");
+      //     setClickedBook(null);
+      //     setWhiteInkBookPosition(null);
+      //     // Don't reset animationKey - let it keep incrementing
+      //   }, 500);
+      // }, 7000);
+      setShowWhiteInkAnimation(false);
+          setWhiteInkAnimationPhase("idle");
           scrollToWhiteInk();
-          setTimeout(() => {
-            setShowWhiteInkAnimation(false);
-            setWhiteInkAnimationPhase("idle");
-          }, 1000);
-        }
-      }, 10000);
-    }, 1000);
-  };
+          setClickedBook(null);
+          setWhiteInkBookPosition(null);
+    }, 2000);
+  }, [
+    showWhiteInkAnimation,
+    playClickSound,
+    scrollToWhiteInk,
+  ]);
 
   // Callback to receive contact book position from HeroSection
-  const handleContactBookPositionChange = (position) => {
+  const handleContactBookPositionChange = useCallback((position) => {
     setContactBookPosition(position);
-  };
+  }, []);
 
-  // Navigation items data structure
-  const navigationItems = [
-    {
-      text: "CONTACT",
-      onClick: handleContactClick,
-      isContact: true,
-      style: {
-        backgroundImage: `url(${book5})`,
-        fontSize: "clamp(12px, 1.2vw, 46px)",
-        overflow: "auto",
+  // Callback to receive about book position from HeroSection
+  const handleAboutBookPositionChange = useCallback((position) => {
+    setAboutBookPosition(position);
+  }, []);
+
+  // Callback to receive because book position from HeroSection
+  const handleBecauseBookPositionChange = useCallback((position) => {
+    setBecauseBookPosition(position);
+  }, []);
+
+  // Callback to receive lorem book position from HeroSection
+  const handleLoremBookPositionChange = useCallback((position) => {
+    setLoremBookPosition(position);
+  }, []);
+
+  // Callback to receive services book position from HeroSection
+  const handleServicesBookPositionChange = useCallback((position) => {
+    setServicesBookPosition(position);
+  }, []);
+
+  // Callback to receive white ink book position from HeroSection
+  const handleWhiteInkBookPositionChange = useCallback((position) => {
+    setWhiteInkBookPosition(position);
+  }, []);
+
+  // Memoize animation states to prevent unnecessary re-renders
+  const animationStates = useMemo(
+    () => ({
+      showContactAnimation,
+      showBecauseAnimation,
+      showLoremAnimation,
+      showServicesAnimation,
+      showAboutAnimation,
+      showWhiteInkAnimation,
+    }),
+    [
+      showContactAnimation,
+      showBecauseAnimation,
+      showLoremAnimation,
+      showServicesAnimation,
+      showAboutAnimation,
+      showWhiteInkAnimation,
+    ]
+  );
+
+  // Memoize animation phases to prevent unnecessary re-renders
+  const animationPhases = useMemo(
+    () => ({
+      contactAnimationPhase,
+      becauseAnimationPhase,
+      loremAnimationPhase,
+      servicesAnimationPhase,
+      aboutAnimationPhase,
+      whiteInkAnimationPhase,
+    }),
+    [
+      contactAnimationPhase,
+      becauseAnimationPhase,
+      loremAnimationPhase,
+      servicesAnimationPhase,
+      aboutAnimationPhase,
+      whiteInkAnimationPhase,
+    ]
+  );
+
+  // Navigation items data structure - memoized to prevent re-creation
+  const navigationItems = useMemo(
+    () => [
+      {
+        text: "CONTACT",
+        onClick: handleContactClick,
+        isContact: true,
+        style: {
+          backgroundImage: `url(${book5})`,
+          fontSize: "clamp(12px, 1.2vw, 46px)",
+          overflow: "auto",
+        },
+        color: "black",
       },
-      color: "black",
-    },
-    {
-      text: "BECAUSE",
-      onClick: handleBecauseClick,
-      isContact: false,
-      style: {
-        backgroundImage: `url(${book4})`,
-        fontSize: "clamp(10px, 1vw, 46px)",
+      {
+        text: "BECAUSE",
+        onClick: handleBecauseClick,
+        isContact: false,
+        style: {
+          backgroundImage: `url(${book4})`,
+          fontSize: "clamp(10px, 1vw, 46px)",
+        },
+        color: "#5bada1", // Teal
       },
-      color: "#5bada1", // Teal
-    },
-    {
-      text: "Lorem",
-      onClick: handleLoremClick,
-      isContact: false,
-      style: {
-        backgroundColor: "black",
-        fontSize: "clamp(8px, 0.8vw, 46px)",
-        fontFamily: "Brush Script MT, cursive, fantasy, serif",
+      {
+        text: "Lorem",
+        onClick: handleLoremClick,
+        isContact: false,
+        style: {
+          backgroundColor: "black",
+          fontSize: "clamp(8px, 0.8vw, 46px)",
+          fontFamily: "Brush Script MT, cursive, fantasy, serif",
+        },
+        color: "#9e8c3d", // Gold
       },
-      color: "#9e8c3d", // Gold
-    },
-    {
-      text: "SERVICES",
-      onClick: handleServicesClick,
-      isContact: false,
-      style: {
-        backgroundImage: `url(${book1})`,
-        fontSize: "clamp(10px, 1vw, 46px)",
+      {
+        text: "SERVICES",
+        onClick: handleServicesClick,
+        isContact: false,
+        style: {
+          backgroundImage: `url(${book1})`,
+          fontSize: "clamp(10px, 1vw, 46px)",
+        },
+        color: "#584da0", // Purple
       },
-      color: "#584da0", // Purple
-    },
-    {
-      text: "ABOUT",
-      onClick: handleAboutClick,
-      isContact: false,
-      style: {
-        backgroundImage: `url(${book3})`,
-        fontSize: "clamp(10px, 1vw, 46px)",
+      {
+        text: "ABOUT",
+        onClick: handleAboutClick,
+        isContact: false,
+        style: {
+          backgroundImage: `url(${book3})`,
+          fontSize: "clamp(10px, 1vw, 46px)",
+        },
+        color: "#064e3b", // Green
       },
-      color: "#064e3b", // Green
-    },
-    {
-      text: "WHITE INK",
-      onClick: handleWhiteInkClick,
-      isContact: false,
-      style: {
-        backgroundImage: `url(${book2})`,
-        fontSize: "clamp(10px, 1vw, 46px)",
+      {
+        text: "WHITE INK",
+        onClick: handleWhiteInkClick,
+        isContact: false,
+        style: {
+          backgroundImage: `url(${book2})`,
+          fontSize: "clamp(10px, 1vw, 46px)",
+        },
+        color: "#9e8c3d", // Gold
       },
-      color: "#9e8c3d", // Gold
-    },
-  ];
+    ],
+    [
+      handleContactClick,
+      handleBecauseClick,
+      handleLoremClick,
+      handleServicesClick,
+      handleAboutClick,
+      handleWhiteInkClick,
+    ]
+  );
 
   // Video content sections data structure
   const videoSections = [
@@ -561,6 +728,7 @@ const LandingPage = () => {
       audio.currentTime = 0; // Reset to beginning
     }, 3000);
   }, []);
+
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
@@ -620,325 +788,477 @@ const LandingPage = () => {
         handleCameraClick={handleCameraClick}
         scrollToAbout={scrollToAbout}
         onContactBookPositionChange={handleContactBookPositionChange}
-        animationStates={{
-          showContactAnimation,
-          showBecauseAnimation,
-          showLoremAnimation,
-          showServicesAnimation,
-          showAboutAnimation,
-          showWhiteInkAnimation,
-        }}
+        onAboutBookPositionChange={handleAboutBookPositionChange}
+        onBecauseBookPositionChange={handleBecauseBookPositionChange}
+        onLoremBookPositionChange={handleLoremBookPositionChange}
+        onServicesBookPositionChange={handleServicesBookPositionChange}
+        onWhiteInkBookPositionChange={handleWhiteInkBookPositionChange}
+        animationStates={animationStates}
+        animationPhases={animationPhases}
       />
 
       {/* Contact Animation Overlay */}
-      {showContactAnimation && (
-        <div
-          className="w-full h-full fixed inset-0 z-[999999] bg-transparent"
-          style={{
-            overflow: "visible",
-            ...(contactBookPosition
-              ? {
+      {
+        showContactAnimation && (
+          <>
+            <div
+              className={`w-full h-full fixed inset-0 z-[999999] bg-transparent transition-all duration-500 ease-in-out ${
+                contactAnimationPhase === "video"
+                  ? "bg-black bg-opacity-10"
+                  : ""
+              }`}
+              style={{
+                overflow: "visible",
+                ...(contactBookPosition
+                  ? {
+                      position: "fixed",
+                      top: contactBookPosition?.viewportTop
+                        ? contactBookPosition.viewportTop / 2
+                        : 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 999999,
+                    }
+                  : {}),
+              }}
+            >
+              {/* <ThreeJSModel
+                key={`contact-model-${animationKey}`}
+                modelPath={contactModel}
+                className="w-full h-full  rounded-lg transform-gpu transition-all duration-500 ease-out"
+                style={{
+                  overflow: "visible",
                   position: "fixed",
-                  top: contactBookPosition.viewportTop,
-                  left: contactBookPosition.viewportLeft,
-                  width: contactBookPosition.width,
-                  height: contactBookPosition.height,
-                  zIndex: 999999,
-                }
-              : {}),
-          }}
-        >
-          <div
-            className="relative w-full h-full"
-            style={{ overflow: "visible" }}
-          >
-            {/* Loading State */}
-
-            {/* 3D Model Animation - Show immediately if preloaded */}
-            {contactAnimationPhase === "video" && (
-              <div
-                className="relative w-full h-full justify-center items-center"
-                style={{ overflow: "visible" }}
-              >
-                <ThreeJSModel
-                  modelPath={contactModel}
-                  className="w-full h-full rounded-lg shadow-2xl"
-                  style={{
-                    ...(contactBookPosition
-                      ? {
-                          position: "fixed",
-                          top: contactBookPosition.viewportTop,
-                          left: contactBookPosition.viewportLeft,
-                          width: contactBookPosition.width,
-                          height: contactBookPosition.height,
-                          zIndex: 999999,
-                          overflow: "visible",
-                        }
-                      : { overflow: "visible" }),
-                  }}
-                  bookColor={"#fff"}
-                  objectName="Book"
-                  isVisible={true}
-                  enableControls={false}
-                  enableEnvironment={false}
-                  cameraPosition={[0, 0, 2]}
-                  cameraFov={20}
-                  autoPlayAnimations={true}
-                  animationSpeed={1.0}
-                  onLoad={() => {
-                    console.log("3D model JS loaded successfully");
-                    // Auto-proceed after model loads
-                    setTimeout(() => {
-                      setContactAnimationPhase("scrolling");
-                      scrollToContact();
-                      setTimeout(() => {
-                        setShowContactAnimation(false);
-                        setContactAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 3000); // Show model for 3 seconds
-                  }}
-                  onError={(e) => {
-                    console.error("3D model error:", e);
-                    // Skip model and go to contact after a short delay
-                    setTimeout(() => {
-                      setContactAnimationPhase("scrolling");
-                      scrollToContact();
-                      setTimeout(() => {
-                        setShowContactAnimation(false);
-                        setContactAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 2000);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Because Animation Overlay */}
-      {showBecauseAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
-          <div className="relative">
-            <div className="relative">
-              <SplineModel
-                sceneUrl="https://prod.spline.design/4GWpSUZYplg2P30Z/scene.splinecode"
-                className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
+                  top: contactBookPosition?.viewportTop
+                    ? contactBookPosition.viewportTop / 2
+                    : 0,
+                  left: contactBookPosition?.viewportLeft
+                    ? contactBookPosition.viewportLeft * 10
+                    : 0,
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "1600px",
+                  maxHeight: "1600px",
+                }}
+                bookColor={"#fff"}
                 objectName="Book"
+                isVisible={true}
+                enableControls={false}
+                enableEnvironment={false}
+                cameraPosition={[0, 0, 2]}
+                cameraFov={30}
+                autoPlayAnimations={true}
+                animationSpeed={1.0}
+                animationDuration={2.5}
+                animationStartOffset={0.8}
                 onLoad={() => {
-                  console.log("3D model loaded successfully");
-                  setTimeout(() => {
-                    setBecauseAnimationPhase("scrolling");
-                    scrollToBecauseForUs();
-                    setTimeout(() => {
-                      setShowBecauseAnimation(false);
-                      setBecauseAnimationPhase("idle");
-                      setClickedBook(null);
-                    }, 1000);
-                  }, 3000);
+                  console.log("Contact 3D model loaded successfully");
                 }}
                 onError={(e) => {
-                  console.error("3D model error:", e);
+                  console.error("Contact 3D model error:", e);
+                  // Skip model and go to contact after a short delay
                   setTimeout(() => {
-                    setBecauseAnimationPhase("scrolling");
-                    scrollToBecauseForUs();
+                    setContactAnimationPhase("scrolling");
+                    scrollToContact();
                     setTimeout(() => {
-                      setShowBecauseAnimation(false);
-                      setBecauseAnimationPhase("idle");
+                      setShowContactAnimation(false);
+                      setContactAnimationPhase("idle");
                       setClickedBook(null);
+                      setContactBookPosition(null);
                     }, 1000);
                   }, 2000);
                 }}
-              />
+              /> */}
             </div>
-            {/* 3D Model Animation */}
-          </div>
-        </div>
-      )}
+          </>
+        )
+      }
 
-      {/* Lorem Animation Overlay */}
-      {showLoremAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
-          <div className="relative">
-            {loremAnimationPhase === "video" && (
-              <div className="relative">
-                <SplineModel
-                  sceneUrl="https://prod.spline.design/0yLB649mVeXuvS8Y/scene.splinecode"
-                  className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
-                  objectName="Book"
-                  onLoad={() => {
-                    console.log("3D model loaded successfully");
+      {
+        /* Because Animation Overlay */
+      }
+      {
+        showBecauseAnimation && (
+          <>
+            <div
+              className={`w-full h-full fixed inset-0 z-[999999] bg-transparent transition-all duration-500 ease-in-out ${
+                becauseAnimationPhase === "video"
+                  ? "bg-black bg-opacity-10"
+                  : ""
+              }`}
+              style={{
+                overflow: "visible",
+                ...(becauseBookPosition
+                  ? {
+                      position: "fixed",
+                      top: becauseBookPosition?.viewportTop
+                        ? becauseBookPosition.viewportTop / 2
+                        : 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 999999,
+                    }
+                  : {}),
+              }}
+            >
+              {/* <ThreeJSModel
+                key={`because-model-${animationKey}`}
+                modelPath={becauseModel}
+                className="w-full h-full rounded-lg transform-gpu transition-all duration-500 ease-out"
+                style={{
+                  overflow: "visible",
+                  position: "fixed",
+                  top: becauseBookPosition?.viewportTop
+                    ? becauseBookPosition.viewportTop / 2
+                    : 0,
+                  left: becauseBookPosition?.viewportLeft
+                    ? becauseBookPosition.viewportLeft * 10
+                    : 0,
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "1600px",
+                  maxHeight: "1600px",
+                }}
+                bookColor={"#5bada1"}
+                objectName="Book"
+                isVisible={true}
+                enableControls={false}
+                enableEnvironment={false}
+                cameraPosition={[0, 0, 2]}
+                cameraFov={30}
+                autoPlayAnimations={true}
+                animationSpeed={1.0}
+                animationDuration={2.5}
+                animationStartOffset={0.8}
+                onLoad={() => {
+                  console.log("Because 3D model loaded successfully");
+                }}
+                onError={(e) => {
+                  console.error("Because 3D model error:", e);
+                  // Skip model and go to because section after a short delay
+                  setTimeout(() => {
+                    setBecauseAnimationPhase("scrolling");
+                    scrollToBecauseForUs();
                     setTimeout(() => {
-                      setLoremAnimationPhase("scrolling");
-                      scrollToSeera();
-                      setTimeout(() => {
-                        setShowLoremAnimation(false);
-                        setLoremAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 3000);
-                  }}
-                  onError={(e) => {
-                    console.error("3D model error:", e);
-                    setTimeout(() => {
-                      setLoremAnimationPhase("scrolling");
-                      scrollToSeera();
-                      setTimeout(() => {
-                        setShowLoremAnimation(false);
-                        setLoremAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 2000);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                      setShowBecauseAnimation(false);
+                      setBecauseAnimationPhase("idle");
+                      setClickedBook(null);
+                      setAboutBookPosition(null);
+                    }, 1000);
+                  }, 2000);
+                }}
+              /> */}
+            </div>
+          </>
+        )
+      }
 
-      {/* Services Animation Overlay */}
-      {showServicesAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
-          <div className="relative">
-            {servicesAnimationPhase === "video" && (
-              <div className="relative">
-                <SplineModel
-                  sceneUrl="https://prod.spline.design/yBnsN6cuP6WQiMdG/scene.splinecode"
-                  className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg shadow-2xl"
-                  objectName="Book"
-                  onLoad={() => {
-                    console.log("3D model loaded successfully");
+      {
+        /* Lorem Animation Overlay */
+      }
+      {
+        showLoremAnimation && (
+          <>
+            <div
+              className={`w-full h-full fixed inset-0 z-[999999] bg-transparent transition-all duration-500 ease-in-out ${
+                loremAnimationPhase === "video" ? "bg-black bg-opacity-10" : ""
+              }`}
+              style={{
+                overflow: "visible",
+                ...(loremBookPosition
+                  ? {
+                      position: "fixed",
+                      top: loremBookPosition?.viewportTop
+                        ? loremBookPosition.viewportTop / 2
+                        : 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 999999,
+                    }
+                  : {}),
+              }}
+            >
+              {/* <ThreeJSModel
+                key={`lorem-model-${animationKey}`}
+                modelPath={loremModel}
+                className="w-full h-full rounded-lg transform-gpu transition-all duration-500 ease-out"
+                style={{
+                  overflow: "visible",
+                  position: "fixed",
+                  top: loremBookPosition?.viewportTop
+                    ? loremBookPosition.viewportTop / 2
+                    : 0,
+                  left: loremBookPosition?.viewportLeft
+                    ? loremBookPosition.viewportLeft * 10
+                    : 0,
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "1600px",
+                  maxHeight: "1600px",
+                }}
+                bookColor={"#9e8c3d"}
+                objectName="Book"
+                isVisible={true}
+                enableControls={false}
+                enableEnvironment={false}
+                cameraPosition={[0, 0, 2]}
+                cameraFov={30}
+                autoPlayAnimations={true}
+                animationSpeed={1.0}
+                animationDuration={2.5}
+                animationStartOffset={0.8}
+                onLoad={() => {
+                  console.log("Lorem 3D model loaded successfully");
+                }}
+                onError={(e) => {
+                  console.error("Lorem 3D model error:", e);
+                  // Skip model and go to seera section after a short delay
+                  setTimeout(() => {
+                    setLoremAnimationPhase("scrolling");
+                    scrollToSeera();
                     setTimeout(() => {
-                      setServicesAnimationPhase("scrolling");
-                      scrollToWhiteInk();
-                      setTimeout(() => {
-                        setShowServicesAnimation(false);
-                        setServicesAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 3000);
-                  }}
-                  onError={(e) => {
-                    console.error("3D model error:", e);
+                      setShowLoremAnimation(false);
+                      setLoremAnimationPhase("idle");
+                      setClickedBook(null);
+                      setAboutBookPosition(null);
+                    }, 1000);
+                  }, 2000);
+                }}
+              /> */}
+            </div>
+          </>
+        )
+      }
+
+      {
+        /* Services Animation Overlay */
+      }
+      {
+        showServicesAnimation && (
+          <>
+            <div
+              className={`w-full h-full fixed inset-0 z-[999999] bg-transparent transition-all duration-500 ease-in-out ${
+                servicesAnimationPhase === "video"
+                  ? "bg-black bg-opacity-10"
+                  : ""
+              }`}
+              style={{
+                overflow: "visible",
+                ...(servicesBookPosition
+                  ? {
+                      position: "fixed",
+                      top: servicesBookPosition?.viewportTop
+                        ? servicesBookPosition.viewportTop / 2
+                        : 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 999999,
+                    }
+                  : {}),
+              }}
+            >
+              {/* <ThreeJSModel
+                key={`services-model-${animationKey}`}
+                modelPath={serviceModel}
+                className="w-full h-full rounded-lg transform-gpu transition-all duration-500 ease-out"
+                style={{
+                  overflow: "visible",
+                  position: "fixed",
+                  top: servicesBookPosition?.viewportTop
+                    ? servicesBookPosition.viewportTop / 2
+                    : 0,
+                  left: servicesBookPosition?.viewportLeft
+                    ? servicesBookPosition.viewportLeft * 10
+                    : 0,
+                  width: "100%",
+                  height: "100%",
+                  maxWidth: "1600px",
+                  maxHeight: "1600px",
+                }}
+                bookColor={"#584da0"}
+                objectName="Book"
+                isVisible={true}
+                enableControls={false}
+                enableEnvironment={false}
+                cameraPosition={[0, 0, 2]}
+                cameraFov={30}
+                autoPlayAnimations={true}
+                animationSpeed={1.0}
+                animationDuration={2.5}
+                animationStartOffset={0.8}
+                onLoad={() => {
+                  console.log("Services 3D model loaded successfully");
+                }}
+                onError={(e) => {
+                  console.error("Services 3D model error:", e);
+                  // Skip model and go to white ink section after a short delay
+                  setTimeout(() => {
+                    setServicesAnimationPhase("scrolling");
+                    scrollToWhiteInk();
                     setTimeout(() => {
-                      setServicesAnimationPhase("scrolling");
-                      scrollToWhiteInk();
-                      setTimeout(() => {
-                        setShowServicesAnimation(false);
-                        setServicesAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 2000);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                      setShowServicesAnimation(false);
+                      setServicesAnimationPhase("idle");
+                      setClickedBook(null);
+                      setAboutBookPosition(null);
+                    }, 1000);
+                  }, 2000);
+                }}
+              /> */}
+            </div>
+          </>
+        )
+      }
 
       {/* About Animation Overlay */}
       {showAboutAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
-          <div className="relative">
-            {aboutAnimationPhase === "video" && (
-              <div className="relative">
-                <SplineModel
-                  sceneUrl="https://prod.spline.design/1UhDKguUwLtmfEky/scene.splinecode"
-                  className="w-full h-auto max-w-4xl max-h-[80vh] rounded-lg md:h-[10vh] md:w-[10vw] shadow-2xl"
-                  bookColor={
-                    clickedBook
-                      ? navigationItems.find(
-                          (item) =>
-                            (clickedBook === "contact" &&
-                              item.text === "CONTACT") ||
-                            (clickedBook === "because" &&
-                              item.text === "BECAUSE") ||
-                            (clickedBook === "lorem" &&
-                              item.text === "Lorem") ||
-                            (clickedBook === "services" &&
-                              item.text === "SERVICES") ||
-                            (clickedBook === "about" &&
-                              item.text === "ABOUT") ||
-                            (clickedBook === "whiteink" &&
-                              item.text === "WHITE INK")
-                        )?.color
-                      : "#064e3b"
+        <>
+          <div
+            className={`w-full h-full fixed inset-0 z-[999999] bg-transparent transition-all duration-500 ease-in-out ${
+              aboutAnimationPhase === "video" ? "bg-black bg-opacity-10" : ""
+            }`}
+            style={{
+              overflow: "visible",
+              ...(aboutBookPosition
+                ? {
+                    position: "fixed",
+                    top: aboutBookPosition?.viewportTop
+                      ? aboutBookPosition.viewportTop / 2
+                      : 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 999999,
                   }
-                  objectName="Book"
-                  onLoad={() => {
-                    console.log("3D model loaded successfully");
-                    setTimeout(() => {
-                      setAboutAnimationPhase("scrolling");
-                      scrollToAbout();
-                      setTimeout(() => {
-                        setShowAboutAnimation(false);
-                        setAboutAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 3000);
-                  }}
-                  onError={(e) => {
-                    console.error("3D model error:", e);
-                    setTimeout(() => {
-                      setAboutAnimationPhase("scrolling");
-                      scrollToAbout();
-                      setTimeout(() => {
-                        setShowAboutAnimation(false);
-                        setAboutAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 2000);
-                  }}
-                />
-              </div>
-            )}
+                : {}),
+            }}
+          >
+            {/* <ThreeJSModel
+              key={`about-model-${animationKey}`}
+              modelPath={aboutModel}
+              className="w-full h-full rounded-lg transform-gpu transition-all duration-500 ease-out"
+              style={{
+                overflow: "visible",
+                position: "fixed",
+                top: aboutBookPosition?.viewportTop
+                  ? aboutBookPosition.viewportTop / 2
+                  : 0,
+                left: aboutBookPosition?.viewportLeft
+                  ? aboutBookPosition.viewportLeft * 10
+                  : 0,
+                width: "100%",
+                height: "100%",
+                maxWidth: "1600px",
+                maxHeight: "1600px",
+              }}
+              bookColor={"#064e3b"}
+              objectName="Book"
+              isVisible={true}
+              enableControls={false}
+              enableEnvironment={false}
+              cameraPosition={[0, 0, 2]}
+              cameraFov={30}
+              autoPlayAnimations={true}
+              animationSpeed={1.0}
+              animationDuration={2.5}
+              animationStartOffset={0.8}
+              onLoad={() => {
+                console.log("About 3D model loaded successfully");
+              }}
+              onError={(e) => {
+                console.error("About 3D model error:", e);
+                // Skip model and go to about section after a short delay
+                setTimeout(() => {
+                  setAboutAnimationPhase("scrolling");
+                  scrollToAbout();
+                  setTimeout(() => {
+                    setShowAboutAnimation(false);
+                    setAboutAnimationPhase("idle");
+                    setClickedBook(null);
+                    setAboutBookPosition(null);
+                  }, 1000);
+                }, 2000);
+              }}
+            /> */}
           </div>
-        </div>
+        </>
       )}
 
       {/* White Ink Animation Overlay */}
       {showWhiteInkAnimation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-90">
-          <div className="relative">
-            {whiteInkAnimationPhase === "video" && (
-              <div className="relative">
-                <SplineModel
-                  sceneUrl="https://prod.spline.design/RW8B8ADwVqanNatQ/scene.splinecode"
-                  className="w-full h-auto max-w-4xl max-h-[80vh]  rounded-lg shadow-2xl"
-                  objectName="Book"
-                  onLoad={() => {
-                    console.log("3D model loaded successfully");
-                    setTimeout(() => {
-                      setWhiteInkAnimationPhase("scrolling");
-                      scrollToWhiteInk();
-                      setTimeout(() => {
-                        setShowWhiteInkAnimation(false);
-                        setWhiteInkAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 3000);
-                  }}
-                  onError={(e) => {
-                    console.error("3D model error:", e);
-                    setTimeout(() => {
-                      setWhiteInkAnimationPhase("scrolling");
-                      scrollToWhiteInk();
-                      setTimeout(() => {
-                        setShowWhiteInkAnimation(false);
-                        setWhiteInkAnimationPhase("idle");
-                        setClickedBook(null);
-                      }, 1000);
-                    }, 2000);
-                  }}
-                />
-              </div>
-            )}
+        <>
+          <div
+            className={`w-full h-full fixed inset-0 z-[999999] bg-transparent transition-all duration-500 ease-in-out ${
+              whiteInkAnimationPhase === "video" ? "bg-black bg-opacity-10" : ""
+            }`}
+            style={{
+              overflow: "visible",
+              ...(whiteInkBookPosition
+                ? {
+                    position: "fixed",
+                    top: whiteInkBookPosition?.viewportTop
+                      ? whiteInkBookPosition.viewportTop / 2
+                      : 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 999999,
+                  }
+                : {}),
+            }}
+          >
+            {/* <ThreeJSModel
+              key={`whiteink-model-${animationKey}`}
+              modelPath={whiteInkModel}
+              className="w-full h-full rounded-lg transform-gpu transition-all duration-500 ease-out"
+              style={{
+                overflow: "visible",
+                position: "fixed",
+                top: whiteInkBookPosition?.viewportTop
+                  ? whiteInkBookPosition.viewportTop / 2
+                  : 0,
+                left: whiteInkBookPosition?.viewportLeft
+                  ? whiteInkBookPosition.viewportLeft * 10
+                  : 0,
+                width: "100%",
+                height: "100%",
+                maxWidth: "1600px",
+                maxHeight: "1600px",
+              }}
+              bookColor={"#9e8c3d"}
+              objectName="Book"
+              isVisible={true}
+              enableControls={false}
+              enableEnvironment={false}
+              cameraPosition={[0, 0, 2]}
+              cameraFov={30}
+              autoPlayAnimations={true}
+              animationSpeed={1.0}
+              animationDuration={2.5}
+              animationStartOffset={0.8}
+              onLoad={() => {
+                console.log("White Ink 3D model loaded successfully");
+              }}
+              onError={(e) => {
+                console.error("White Ink 3D model error:", e);
+                // Skip model and go to white ink section after a short delay
+                setTimeout(() => {
+                  setWhiteInkAnimationPhase("scrolling");
+                  scrollToWhiteInk();
+                  setTimeout(() => {
+                    setShowWhiteInkAnimation(false);
+                    setWhiteInkAnimationPhase("idle");
+                    setClickedBook(null);
+                    setAboutBookPosition(null);
+                  }, 1000);
+                }, 2000);
+              }}
+            /> */}
           </div>
-        </div>
+        </>
       )}
 
       <CameraModal

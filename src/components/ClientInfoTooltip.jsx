@@ -11,7 +11,7 @@ const ClientInfoTooltip = ({ children, placement = "top" }) => {
   const [ipAddress, setIpAddress] = useState("");
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
 
   // Update time every second
   useEffect(() => {

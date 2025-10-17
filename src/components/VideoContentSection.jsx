@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState, forwardRef } from "react";
-import SplineModel from "./SplineModel";
 
 const VideoContentSection = forwardRef(
   (
@@ -29,9 +28,9 @@ const VideoContentSection = forwardRef(
       onVideoPlay = null,
       onVideoPause = null,
       onVideoEnd = null,
-      onSplineLoad = null,
-      bookColor = null,
-      objectName = "Book",
+
+      // eslint-disable-next-line no-unused-vars
+      descriptionWidth, // Extract this prop to prevent it from being passed to DOM
       ...props
     },
     ref
@@ -119,28 +118,18 @@ const VideoContentSection = forwardRef(
             splineUrl ? "" : "bg-white"
           } rounded-lg ${contentHeight} w-full`}
         >
-          {splineUrl ? (
-            <SplineModel
-              sceneUrl={splineUrl}
-              className={`${videoHeight} rounded-lg`}
-              onLoad={onSplineLoad}
-              bookColor={bookColor}
-              objectName={objectName}
-            />
-          ) : (
-            <video
-              ref={videoRef}
-              src={videoSrc}
-              className={`${videoHeight} object-cover rounded-lg`}
-              muted={muted}
-              playsInline={playsInline}
-              controls={controls}
-              loop={loop}
-              onPlay={handleVideoPlay}
-              onPause={handleVideoPause}
-              onEnded={handleVideoEnd}
-            />
-          )}
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            className={`${videoHeight} object-cover rounded-lg`}
+            muted={muted}
+            playsInline={playsInline}
+            controls={controls}
+            loop={loop}
+            onPlay={handleVideoPlay}
+            onPause={handleVideoPause}
+            onEnded={handleVideoEnd}
+          />
         </div>
 
         {/* Content Section with Gradient Background */}
@@ -179,6 +168,6 @@ const VideoContentSection = forwardRef(
   }
 );
 
-VideoContentSection.displayName = 'VideoContentSection';
+VideoContentSection.displayName = "VideoContentSection";
 
 export default VideoContentSection;
