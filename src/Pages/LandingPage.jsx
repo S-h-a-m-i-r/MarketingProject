@@ -2,7 +2,6 @@ import React, {
   useState,
   useRef,
   useCallback,
-  useEffect,
   useMemo,
 } from "react";
 import book1 from "../assets/images/b1.png";
@@ -33,16 +32,14 @@ import CompanyIntroSection from "../components/CompanyIntroSection";
 import CameraModal from "../components/CameraModal";
 import UploadModal from "../components/UploadModal";
 import FooterSection from "../components/FooterSection";
-import ThreeJSModel from "../components/ThreeJSModel";
-import { preloadModel } from "../utils/modelUtils";
 import ClientInfoTooltip from "../components/ClientInfoTooltip";
-import contactModel from "../assets/models/Contact.glb";
+
 import phone from "../assets/sounds/mouse-click-153941.mp3";
-import becauseModel from "../assets/models/Because.glb";
-import loremModel from "../assets/models/black.glb";
-import serviceModel from "../assets/models/service.glb";
-import aboutModel from "../assets/models/about.glb";
-import whiteInkModel from "../assets/models/WhiteInk.glb";
+
+
+
+
+
 
 const LandingPage = () => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -60,15 +57,6 @@ const LandingPage = () => {
   const [whiteInkBookPosition, setWhiteInkBookPosition] = useState(null);
 
   // Preload all models when component mounts
-  useEffect(() => {
-    console.log("Preloading all models...");
-    preloadModel(contactModel);
-    preloadModel(becauseModel);
-    preloadModel(loremModel);
-    preloadModel(serviceModel);
-    preloadModel(aboutModel);
-    preloadModel(whiteInkModel);
-  }, []);
 
   
   const [becauseAnimationPhase, setBecauseAnimationPhase] = useState("idle"); // 'idle', 'scaling', 'video', 'scrolling'
@@ -659,24 +647,29 @@ const LandingPage = () => {
       description: (
         <div className="flex   justify-end flex-col items-end space-y-6">
           <div className="flex flex-col items-center space-y-2">
-            <ClientInfoTooltip placement="top">
+          <div className="flex items-center justify-center gap-5 ">
+          <p className="font-[Playfair_Display] text-[26px]">
+              info@whiteinkae.com
+              </p>
               <div
                 className="bg-white p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
                 onClick={mouseCLickRing}
               >
-                <IoMdMail className="text-[#ad2b2b] text-2xl" />
+                <IoMdMail className="text-[#ad2b2b]" />
               </div>
-            </ClientInfoTooltip>
+              </div>
+            
           </div>
           <div className="flex flex-col items-center space-y-2">
-            <ClientInfoTooltip placement="top">
+          <div className="flex items-center gap-5">
+          <p className="font-[Arial_Helvetica_sans-serif] text-26px]"> +971 50 784 8788</p>
               <div
                 className="bg-white p-2 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
                 onClick={mouseCLickRing}
               >
                 <MdLocalPhone className="text-[#ad2b2b] text-2xl" />
               </div>
-            </ClientInfoTooltip>
+              </div>
           </div>
         </div>
       ),
