@@ -437,7 +437,7 @@ const HeroSection = ({
                 src={clock}
                 alt="clock"
                 className=" h-20 ml-1 w-15 cursor-pointer transition-all duration-200 ease-in-out hover:scale-y-105 clock-hover-glow
-                sm:h-30 sm:w-20 md:h-35 md:w-30 lg:h-50 lg:w-35 xl:h-75 xl:w-50 2xl:h-80 2xl:w-60"
+                sm:h-30 sm:w-20 md:h-35 md:w-30 lg:h-50 lg:w-35 xl:h-55 xl:w-50 2xl:h-80 2xl:w-60"
                 onClick={calculateContactBookPosition}
               />
             </ClientInfoTooltip>
@@ -487,7 +487,7 @@ const HeroSection = ({
                          : "opacity-100"
                      }
                      ${isScaling ? "transform-gpu shadow-[0_0_40px_20px_rgba(0,0,0,0.3)]" : ""}
-                     ${"2xl:h-90 2xl:w-20 xl:h-80 xl:w-18 lg:h-50 lg:w-10 md:h-35 md:w-8 sm:h-30 sm:w-8"}`}
+                     ${"2xl:h-90 2xl:w-20 xl:h-80 xl:w-18 lg:h-50 lg:w-10 md:h-35 md:w-8 sm:h-30 sm:w-8 firstShelfBooks"}`}
                     style={{
                       ...item.style,
                       writingMode: "vertical-rl",
@@ -624,7 +624,7 @@ const HeroSection = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center pt-1 justify-between 2xl:pt-0 xl:pt-12 md:pt-0 sm:pt-0 relative">
+          <div className="flex items-center pt-1 justify-between 2xl:pt-0  md:pt-0 sm:pt-0 relative">
             <div
               style={{
                 backgroundImage: `url(${landScapeDrawer})`,
@@ -645,7 +645,7 @@ const HeroSection = ({
                 xl:mr-30 xl:ml-30 xl:h-65
                 lg:mr-20 lg:ml-20 lg:h-55
                 md:mr-10 md:ml-10 md:h-45
-                sm:mr-5 sm:ml-5 sm:h-35
+                sm:mr-5 sm:ml-5 sm:h-35 fourthShelf
                 ${isDrawerScaling ? "t-5 transform-gpu" : ""}`}
               onClick={handleDrawerClick}
             >

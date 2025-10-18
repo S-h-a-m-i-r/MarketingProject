@@ -314,11 +314,12 @@
     height: 3.75rem; /* base h-15 */
   }
 }
-@media (min-width: 400px) and (max-width: 450px) {
+@media (min-width: 400px) and (max-width: 449px) {
   .thirdShelfSeeraBoxInkPot {
     height: 5rem; /* base h-15 */
   }
 }
+
 @media (min-width: 450px) and (max-width: 500px) {
   .thirdShelfSeeraBoxInkPot {
     height: 5rem; /* base h-15 */
@@ -354,7 +355,21 @@
     padding-right: 7.5rem; /* xl:px-30 */
   }
 }
-
+@media (min-width: 1220px) and (max-width: 1439px) {
+  .firstShelfBooks {
+    height: 265px !important;
+    width: 42px !important;
+  }
+  .secondShelf {
+    padding-top: 6.5rem;     /* pt-18 */
+    padding-right: 12.5rem;   /* pr-10 */
+    padding-left: 10.75rem;
+    
+  }
+  .fourthShelf {
+    padding-top: 5rem;     /* pt-18 */
+  }
+}
 /* lg (≤1279px) */
 @media (max-width: 1279px) {
   .firstShelf {
