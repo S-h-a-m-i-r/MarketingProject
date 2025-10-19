@@ -400,19 +400,19 @@
 /* xs (≤475px) */
 @media (min-width: 450px) and (max-width: 500px) {
   .firstShelf {
-    padding-top: 15.5rem; /* base pt-37 */
-    padding-left: 2.5rem; /* base px-10 */
-    padding-right: 2.5rem; /* base px-10 */
+    padding-top: 7rem; /* base pt-37 */
+    padding-left: 5rem; /* base px-10 */
+    padding-right: 4rem; /* base px-10 */
   }
   .secondShelf {
-    padding-top: 8.5rem;     /* pt-18 */
-    padding-right: 2.5rem;   /* pr-10 */
+    padding-top: 5rem;     /* pt-18 */
+    padding-right: 4rem;   /* pr-10 */
     padding-left: 3.75rem;
     
   }
   .thirdShelf {
-    padding-top: 6.5rem;        /* pt-22 */
-    padding-right: 3rem;           /* pr-0 */
+    padding-top: 3.5rem;
+    padding-right: 4.3rem;           /* pr-0 */
     padding-left: 3.75rem; 
     padding-bottom: 0.7rem;
   }
@@ -420,7 +420,8 @@
     height: 5rem; /* base h-15 */
   }
   .thirdShelfSeeraBox {
-    height: 3rem; /* base h-15 */
+    height: 2rem;
+    width: 8rem
   }
 }
 @media (min-width: 800px) and (max-width: 850px) {
@@ -455,32 +456,39 @@
 }
 @media (min-width: 400px) and (max-width: 449px) {
   .firstShelf {
-    padding-top: 13.2rem; /* base pt-37 */
-    padding-left: 2.5rem; /* base px-10 */
-    padding-right: 2.5rem; /* base px-10 */
+    padding-top: clamp(8rem, 20.4vw, 20rem);
+    padding-left: 4rem; /* base px-10 */
+    padding-right:3.5rem; /* base px-10 */
   }
-  .thirdShelf{
-    padding-bottom: 0.7rem;
+  .secondShelf {
+    padding-top: 3.5rem;
+    padding-left: 4rem; /* base px-10 */
+    padding-right: 5rem; /* base px-10 */
+  }
+  .thirdShelf {
+    padding-left: 2rem; /* base px-10 */
+    padding-right: 3.2rem; /* base px-10 */
   }
   .thirdShelfSeeraBox {
-    height: 3.2rem; /* base h-15 */
+    height: 2.5rem;
+    width: 8rem
   }
 }
 @media (min-width: 380px) and (max-width: 399px) {
   .firstShelf {
-    padding-top: 11.5rem; /* base pt-37 */
+    padding-top: 8rem; /* base pt-37 */
     padding-left: 2.5rem; /* base px-10 */
     padding-right: 2.5rem; /* base px-10 */
   }
   .secondShelf {
-    padding-top: 6.3rem;     /* pt-18 */
-    padding-right: 2.5rem;   /* pr-10 */
-    padding-left: 3.75rem;
+    padding-top: 3.5rem;     /* pt-18 */
+    padding-right: 3.5rem;   /* pr-10 */
+    padding-left: 3.2rem;
     padding-bottom: 0.7rem;
   }
   .thirdShelf {
     padding-top: 3rem;        /* pt-22 */
-    padding-right: 2rem;           /* pr-0 */
+    padding-right: 3.5rem;           /* pr-0 */
     padding-left: 2rem; 
     /* padding-bottom: 0.7rem; */
   }
@@ -488,49 +496,25 @@
     height: 5rem; /* base h-15 */
   }
   .thirdShelfSeeraBox {
-    height: 3rem; /* base h-15 */
+    height: 2.5rem;
+    width: 8rem 
   }
 }
 @media (min-width: 360px) and (max-width: 379px) {
   .firstShelf {
-    padding-top: 10.5rem; /* base pt-37 */
-    padding-left: 2.5rem; /* base px-10 */
-    padding-right: 2.5rem; /* base px-10 */
-  }
-  .secondShelf {
-    padding-top: 6.3rem;     /* pt-18 */
-    padding-right: 2.5rem;   /* pr-10 */
-    padding-left: 3.75rem;
-    padding-bottom: 0.7rem;
-  }
-  .thirdShelf {
-    padding-top: 3rem;        /* pt-22 */
-    padding-right: 2rem;           /* pr-0 */
-    padding-left: 2rem; 
-    /* padding-bottom: 0.7rem; */
-  }
-  .thirdShelfSeeraBoxInkPot {
-    height: 5rem; /* base h-15 */
-  }
-  .thirdShelfSeeraBox {
-    height: 3rem; /* base h-15 */
-  }
-}
-@media (min-width: 350px) and (max-width: 369px) {
-  .firstShelf {
-    padding-top: 10rem; /* base pt-37 */
-    padding-left: 1rem; /* base px-10 */
-    padding-right: 1rem; /* base px-10 */
+    padding-top: 7rem; /* base pt-37 */
+    padding-left: 2rem; /* base px-10 */
+    padding-right: 2rem; /* base px-10 */
   }
   .secondShelf {
     padding-top: 5rem;     /* pt-18 */
-    padding-right: 4.5rem;   /* pr-10 */
-    padding-left: 3.75rem;
+    padding-right:3.5rem;   /* pr-10 */
+    padding-left: 3rem;
     padding-bottom: 0.7rem;
   }
   .thirdShelf {
-    padding-top: 3rem;        /* pt-22 */
-    padding-right: 2.7rem;           /* pr-0 */
+    padding-top: 2.3rem;        /* pt-22 */
+    padding-right: 3rem;           /* pr-0 */
     padding-left: 2rem; 
     /* padding-bottom: 0.7rem; */
   }
@@ -538,8 +522,67 @@
     height: 5rem; /* base h-15 */
   }
   .thirdShelfSeeraBox {
-    height: 2.7rem; /* base h-15 */
-    width: 9.2rem;
+    height: 2.3rem;
+    width: 8rem
+  }
+}
+@media (min-width: 300px) and (max-width: 369px) {
+  .firstShelf {
+    padding-top: 8rem; /* base pt-37 */
+    padding-left: 1.7rem; /* base px-10 */
+    padding-right: 1rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 3.7rem;     /* pt-18 */
+    padding-right: 4.5rem;   /* pr-10 */
+    padding-left: 3.2rem;
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelf {
+    padding-top: 3rem;        /* pt-22 */
+    padding-right: 3.7rem;           /* pr-0 */
+    padding-left: 2rem; 
+    /* padding-bottom: 0.7rem; */
+  }
+  .FourthShelfDrawer{ 
+    padding-top: 2rem !important;
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBox {
+    height: 2.2rem; /* base h-15 */
+    width: 8.2rem;
+  }
+}
+
+@media (min-width: 250px) and (max-width: 299px) {
+  .firstShelf {
+    padding-top: 8rem; /* base pt-37 */
+    padding-left: 0rem; /* base px-10 */
+    padding-right: 0rem; /* base px-10 */
+  }
+  .secondShelf {
+    padding-top: 3.7rem;     /* pt-18 */
+    padding-right: 4.5rem;   /* pr-10 */
+    padding-left: 3.2rem;
+    padding-bottom: 0.7rem;
+  }
+  .thirdShelf {
+    padding-top: 3rem;        /* pt-22 */
+    padding-right: 3.7rem;           /* pr-0 */
+    padding-left: 2rem; 
+    /* padding-bottom: 0.7rem; */
+  }
+  .FourthShelfDrawer{ 
+    padding-top: 2rem !important;
+  }
+  .thirdShelfSeeraBoxInkPot {
+    height: 5rem; /* base h-15 */
+  }
+  .thirdShelfSeeraBox {
+    height: 2.2rem; /* base h-15 */
+    width: 8.2rem;
   }
 }
 

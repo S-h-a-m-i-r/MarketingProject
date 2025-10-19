@@ -419,11 +419,24 @@ const HeroSection = ({
     }
   }, [contactBookPosition, aboutBookPosition]);
 
+
+  const handleInkPotClick = () => {
+    // 1. Play the sound immediately
+    playSound("writing");
+
+    // 2. Set a timeout to wait for 2 seconds (2000 milliseconds)
+    setTimeout(() => {
+      // 3. After the delay, open the default email client
+      window.location.href = "mailto:info@whiteinkae.com";
+    }, 2000);
+  };
+
   return (
     <div className="w-full bg-amber-100">
-      {/* Debug Panel for Book Positions */}
-
-      <div className=" bg-amber-100 relative bg-no-repeat bg-fit flex flex-col max-sm:h-[100dvh]">
+      <div 
+  className="relative bg-cover bg-center bg-no-repeat flex flex-col min-h-screen"
+  style={{ backgroundImage: `url(${landingBackground})` }}
+>
         <img
           src={landingBackground}
           alt="landingBackground"
@@ -449,7 +462,7 @@ const HeroSection = ({
                     animationStates.showContactAnimation) ||
                   (item.text === "BECAUSE" &&
                     animationStates.showBecauseAnimation) ||
-                  (item.text === "Lorem" &&
+                  (item.text === "Seera" &&
                     animationStates.showLoremAnimation) ||
                   (item.text === "SERVICES" &&
                     animationStates.showServicesAnimation) ||
@@ -532,7 +545,7 @@ const HeroSection = ({
                 alt="inkPot"
                 className=" h-15 cursor-pointer transition-all duration-300 ease-in-out hover:scale-y-103 inkpot-hover-glow
                  2xl:h-55 xl:h-45 lg:h-40 md:h-26 sm:h-30"
-                onClick={() => playSound("writing")}
+                onClick={handleInkPotClick}
               />
             </div>
             <div className="flex flex-col items-center cursor-pointer md:pr-15 lg:pr-10 relative">
@@ -646,6 +659,7 @@ const HeroSection = ({
                 lg:mr-20 lg:ml-20 lg:h-55
                 md:mr-10 md:ml-10 md:h-45
                 sm:mr-5 sm:ml-5 sm:h-35 fourthShelf
+                FourthShelfDrawer
                 ${isDrawerScaling ? "t-5 transform-gpu" : ""}`}
               onClick={handleDrawerClick}
             >

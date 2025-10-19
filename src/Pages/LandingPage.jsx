@@ -406,7 +406,7 @@ const LandingPage = () => {
         color: "#5bada1", // Teal
       },
       {
-        text: "Lorem",
+        text: "Seera",
         onClick: handleLoremClick,
         isContact: false,
         style: {
