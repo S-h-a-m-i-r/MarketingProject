@@ -311,7 +311,7 @@
 /* xs (≤639px) */
 @media (max-width: 639px) {
   .thirdShelfSeeraBoxInkPot {
-    height: 3.75rem; /* base h-15 */
+    height: 5.5rem; /* base h-15 */
   }
 }
 @media (min-width: 400px) and (max-width: 449px) {

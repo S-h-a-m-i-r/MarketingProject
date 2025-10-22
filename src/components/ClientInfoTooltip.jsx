@@ -132,7 +132,7 @@ const ClientInfoTooltip = ({ children, placement = "top" }) => {
       overlayStyle={{ maxWidth: "300px" }}
       overlayClassName="client-info-tooltip"
     >
-      <div onClick={fetchIPAddress} className="cursor-pointer">
+      <div onClick={fetchIPAddress} className="cursor-pointer h-full">
         {children}
       </div>
     </Tooltip>
